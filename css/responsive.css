@@ -1,0 +1,416 @@
+/* ===== レスポンシブデザイン ===== */
+
+/* モバイルファースト設計 */
+
+/* 小さいモバイル (320px - 480px) */
+@media (max-width: 480px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 100%;
+        z-index: 2000;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .header {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-section {
+        padding: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .project-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .project-status {
+        text-align: left;
+        width: 100%;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .task-meta {
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .modal {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1rem;
+    }
+}
+
+/* モバイル (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px;
+        z-index: 2000;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .header {
+        padding: 1.25rem;
+    }
+    
+    .dashboard-section {
+        padding: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+    
+    .stat-card {
+        padding: 1.25rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+/* タブレット (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+    }
+    
+    .main-content {
+        margin-left: 240px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .content-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+    
+    .header {
+        padding: 1.5rem 1.5rem;
+    }
+    
+    .dashboard-section {
+        padding: 1.5rem;
+    }
+}
+
+/* デスクトップ (1025px以上) */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 280px;
+    }
+    
+    .main-content {
+        margin-left: 280px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .content-grid {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    }
+    
+    .header {
+        padding: 1.5rem 2rem;
+    }
+    
+    .dashboard-section {
+        padding: 2rem;
+    }
+}
+
+/* 大画面デスクトップ (1440px以上) */
+@media (min-width: 1440px) {
+    .dashboard-section {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .content-grid {
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    }
+}
+
+/* ===== ハンバーガーメニュー ===== */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-toggle:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+/* ===== オーバーレイ ===== */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .mobile-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* ===== ナビゲーションの調整 ===== */
+@media (max-width: 768px) {
+    .nav-link span {
+        display: none;
+    }
+    
+    .nav-link {
+        justify-content: center;
+        padding: 1rem;
+    }
+    
+    .nav-link i {
+        font-size: 1.5rem;
+        width: auto;
+    }
+    
+    .logo span {
+        display: none;
+    }
+    
+    .logo {
+        justify-content: center;
+    }
+}
+
+/* ===== フォームの調整 ===== */
+@media (max-width: 480px) {
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 0.625rem;
+        font-size: 1rem; /* モバイルでのタップしやすさ */
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===== テーブルの調整 ===== */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table {
+        min-width: 600px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* ===== カードの調整 ===== */
+@media (max-width: 480px) {
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 1rem;
+    }
+}
+
+/* ===== ボタンの調整 ===== */
+@media (max-width: 480px) {
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .header-right {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+}
+
+/* ===== 統計カードの調整 ===== */
+@media (max-width: 480px) {
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .stat-icon {
+        align-self: center;
+    }
+}
+
+/* ===== プログレスバーの調整 ===== */
+@media (max-width: 480px) {
+    .progress-bar {
+        width: 100%;
+    }
+}
+
+/* ===== アニメーションの調整 ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===== 印刷用スタイル ===== */
+@media print {
+    .sidebar,
+    .header,
+    .btn,
+    .mobile-menu-toggle {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+    }
+    
+    .dashboard-section {
+        padding: 0 !important;
+    }
+    
+    .stat-card,
+    .content-card {
+        box-shadow: none !important;
+        border: 1px solid var(--gray-300) !important;
+        break-inside: avoid;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+
