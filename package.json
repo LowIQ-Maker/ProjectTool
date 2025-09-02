@@ -1,0 +1,31 @@
+{
+  "name": "project-management-tool",
+  "version": "1.0.0",
+  "description": "個人でのプロジェクト管理を効率化し、進捗と予算を可視化するWebアプリケーション",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000 --open=/",
+    "build": "echo 'Build process not implemented yet'",
+    "test": "echo 'Test process not implemented yet'"
+  },
+  "keywords": [
+    "project-management",
+    "task-management",
+    "progress-tracking",
+    "budget-management",
+    "web-application"
+  ],
+  "author": "トキタ",
+  "license": "",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
