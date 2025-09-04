@@ -13,21 +13,24 @@ class TimeTrackerView {
     }
 
     render() {
-        const container = document.getElementById('time-tracking-container');
-        if (!container) return;
+        const container = document.getElementById('time-tracking');
+        if (!container) {
+            console.error('TimeTrackerView: time-trackingコンテナが見つかりません');
+            return;
+        }
 
         container.innerHTML = `
             <div class="time-tracking-header">
-                <h2>タイムトラッキング</h2>
+                <h2><i class="fas fa-clock"></i> タイムトラッキング</h2>
                 <div class="view-tabs">
                     <button class="tab-btn ${this.currentView === 'active' ? 'active' : ''}" data-view="active">
-                        アクティブタイマー
+                        <i class="fas fa-play"></i> アクティブタイマー
                     </button>
                     <button class="tab-btn ${this.currentView === 'history' ? 'active' : ''}" data-view="history">
-                        履歴
+                        <i class="fas fa-history"></i> 履歴
                     </button>
                     <button class="tab-btn ${this.currentView === 'summary' ? 'active' : ''}" data-view="summary">
-                        サマリー
+                        <i class="fas fa-chart-bar"></i> サマリー
                     </button>
                 </div>
             </div>
@@ -280,8 +283,9 @@ class TimeTrackerView {
     bindEvents() {
         // タブ切り替え
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('tab-btn')) {
-                this.currentView = e.target.dataset.view;
+            if (e.target.closest('.tab-btn')) {
+                const btn = e.target.closest('.tab-btn');
+                this.currentView = btn.dataset.view;
                 this.showCurrentView();
             }
         });
