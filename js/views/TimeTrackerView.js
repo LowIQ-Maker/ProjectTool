@@ -83,8 +83,11 @@ class TimeTrackerView {
 
     renderActiveTimers() {
         try {
+            console.log('TimeTrackerView.renderActiveTimers: 開始');
+            console.log('TimeTrackerView.renderActiveTimers: TimeTrackerインスタンス:', this.timeTracker);
             const activeTimers = this.timeTracker.getActiveTimers();
             console.log('TimeTrackerView.renderActiveTimers: アクティブタイマー数:', activeTimers.length);
+            console.log('TimeTrackerView.renderActiveTimers: アクティブタイマー詳細:', activeTimers);
             
             if (activeTimers.length === 0) {
                 return `
@@ -144,7 +147,11 @@ class TimeTrackerView {
 
     renderHistory() {
         try {
+            console.log('TimeTrackerView.renderHistory: 開始');
+            console.log('TimeTrackerView.renderHistory: TimeTrackerインスタンス:', this.timeTracker);
             const timeEntries = this.timeTracker.timeEntries || [];
+            console.log('TimeTrackerView.renderHistory: 時間エントリ数:', timeEntries.length);
+            console.log('TimeTrackerView.renderHistory: 時間エントリ詳細:', timeEntries);
             const recentEntries = timeEntries
                 .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))
                 .slice(0, 50);
@@ -212,9 +219,14 @@ class TimeTrackerView {
 
     renderSummary() {
         try {
+            console.log('TimeTrackerView.renderSummary: 開始');
+            console.log('TimeTrackerView.renderSummary: TimeTrackerインスタンス:', this.timeTracker);
             const today = new Date();
             const dailySummary = this.timeTracker.getDailyTimeSummary(today);
             const weeklySummary = this.timeTracker.getWeeklyTimeSummary(today);
+            
+            console.log('TimeTrackerView.renderSummary: 日別サマリー:', dailySummary);
+            console.log('TimeTrackerView.renderSummary: 週別サマリー:', weeklySummary);
             
             const totalToday = Object.values(dailySummary || {}).reduce((sum, task) => sum + (task.totalTime || 0), 0);
             const totalWeek = Object.values(weeklySummary || {}).reduce((sum, day) => sum + (day.totalTime || 0), 0);
