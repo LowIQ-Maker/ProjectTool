@@ -557,7 +557,7 @@ function initForms() {
     // プロジェクトフォーム
     const projectForm = document.getElementById('projectForm');
     if (projectForm) {
-        projectForm.addEventListener('submit', handleProjectSubmit);
+        // フォーム送信イベントは削除（ボタンクリックで処理）
         
         // 日付の初期値を設定
         const startDateInput = document.getElementById('projectStartDate');
