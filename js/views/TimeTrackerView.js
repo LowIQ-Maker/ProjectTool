@@ -27,44 +27,50 @@ class TimeTrackerView {
             return;
         }
 
-        container.innerHTML = `
-            <div class="time-tracking-header">
-                <h2><i class="fas fa-clock"></i> タイムトラッキング</h2>
-                <div class="view-tabs">
-                    <button class="tab-btn ${this.currentView === 'active' ? 'active' : ''}" data-view="active">
-                        <i class="fas fa-play"></i> アクティブタイマー
+        try {
+            container.innerHTML = `
+                <div class="time-tracking-header">
+                    <h2><i class="fas fa-clock"></i> タイムトラッキング</h2>
+                    <div class="view-tabs">
+                        <button class="tab-btn ${this.currentView === 'active' ? 'active' : ''}" data-view="active">
+                            <i class="fas fa-play"></i> アクティブタイマー
+                        </button>
+                        <button class="tab-btn ${this.currentView === 'history' ? 'active' : ''}" data-view="history">
+                            <i class="fas fa-history"></i> 履歴
+                        </button>
+                        <button class="tab-btn ${this.currentView === 'summary' ? 'active' : ''}" data-view="summary">
+                            <i class="fas fa-chart-bar"></i> サマリー
+                        </button>
+                    </div>
+                </div>
+
+                <div class="time-tracking-content">
+                    ${this.renderActiveTimers()}
+                    ${this.renderHistory()}
+                    ${this.renderSummary()}
+                </div>
+
+                <div class="time-tracking-actions">
+                    <button id="export-time-data" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> エクスポート
                     </button>
-                    <button class="tab-btn ${this.currentView === 'history' ? 'active' : ''}" data-view="history">
-                        <i class="fas fa-history"></i> 履歴
+                    <button id="import-time-data" class="btn btn-secondary">
+                        <i class="fas fa-upload"></i> インポート
                     </button>
-                    <button class="tab-btn ${this.currentView === 'summary' ? 'active' : ''}" data-view="summary">
-                        <i class="fas fa-chart-bar"></i> サマリー
+                    <button id="clear-time-data" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> データクリア
                     </button>
                 </div>
-            </div>
 
-            <div class="time-tracking-content">
-                ${this.renderActiveTimers()}
-                ${this.renderHistory()}
-                ${this.renderSummary()}
-            </div>
+                <input type="file" id="time-data-file-input" accept=".json,.csv" style="display: none;">
+            `;
 
-            <div class="time-tracking-actions">
-                <button id="export-time-data" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> エクスポート
-                </button>
-                <button id="import-time-data" class="btn btn-secondary">
-                    <i class="fas fa-upload"></i> インポート
-                </button>
-                <button id="clear-time-data" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> データクリア
-                </button>
-            </div>
-
-            <input type="file" id="time-data-file-input" accept=".json,.csv" style="display: none;">
-        `;
-
-        this.showCurrentView();
+            this.showCurrentView();
+            console.log('TimeTrackerView.render: 完了');
+        } catch (error) {
+            console.error('TimeTrackerView.render: エラーが発生しました:', error);
+            container.innerHTML = '<p class="error">タイムトラッキングの表示に失敗しました</p>';
+        }
     }
 
     renderActiveTimers() {
