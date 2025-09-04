@@ -1,0 +1,196 @@
+{
+  "projects": [
+    {
+      "id": "project_1703123456789_abc123def",
+      "name": "プロジェクト管理ツールの作成",
+      "description": "Webベースのプロジェクト管理ツールを開発するプロジェクト。タスク管理、進捗追跡、予算管理機能を含む。",
+      "startDate": "2024-01-15",
+      "endDate": "2024-03-31",
+      "budget": 500000,
+      "status": "in-progress",
+      "createdAt": "2024-01-15T09:00:00.000Z",
+      "updatedAt": "2024-01-15T09:00:00.000Z"
+    },
+    {
+      "id": "project_1703123456790_def456ghi",
+      "name": "ECサイトリニューアル",
+      "description": "既存のECサイトのUI/UXを改善し、モバイル対応を強化するプロジェクト。",
+      "startDate": "2024-02-01",
+      "endDate": "2024-04-30",
+      "budget": 800000,
+      "status": "planned",
+      "createdAt": "2024-01-20T10:30:00.000Z",
+      "updatedAt": "2024-01-20T10:30:00.000Z"
+    },
+    {
+      "id": "project_1703123456791_ghi789jkl",
+      "name": "社内システム統合",
+      "description": "複数の社内システムを統合し、データ連携を改善するプロジェクト。",
+      "startDate": "2024-01-01",
+      "endDate": "2024-06-30",
+      "budget": 1200000,
+      "status": "in-progress",
+      "createdAt": "2024-01-01T08:00:00.000Z",
+      "updatedAt": "2024-01-01T08:00:00.000Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_1703123456789_task001",
+      "projectId": "project_1703123456789_abc123def",
+      "name": "要件定義書の作成",
+      "description": "プロジェクトの詳細要件を整理し、要件定義書を作成する",
+      "priority": "high",
+      "dueDate": "2024-01-25",
+      "estimatedHours": 16,
+      "actualHours": 12,
+      "status": "completed",
+      "createdAt": "2024-01-15T09:15:00.000Z",
+      "updatedAt": "2024-01-20T14:30:00.000Z"
+    },
+    {
+      "id": "task_1703123456790_task002",
+      "projectId": "project_1703123456789_abc123def",
+      "name": "基本設計書の作成",
+      "description": "システムの基本設計とアーキテクチャを設計する",
+      "priority": "high",
+      "dueDate": "2024-02-05",
+      "estimatedHours": 24,
+      "actualHours": 0,
+      "status": "in-progress",
+      "createdAt": "2024-01-15T09:20:00.000Z",
+      "updatedAt": "2024-01-15T09:20:00.000Z"
+    },
+    {
+      "id": "task_1703123456791_task003",
+      "projectId": "project_1703123456789_abc123def",
+      "name": "データベース設計",
+      "description": "プロジェクト管理に必要なデータベーススキーマを設計する",
+      "priority": "medium",
+      "dueDate": "2024-02-10",
+      "estimatedHours": 20,
+      "actualHours": 0,
+      "status": "pending",
+      "createdAt": "2024-01-15T09:25:00.000Z",
+      "updatedAt": "2024-01-15T09:25:00.000Z"
+    },
+    {
+      "id": "task_1703123456792_task004",
+      "projectId": "project_1703123456789_abc123def",
+      "name": "フロントエンド開発",
+      "description": "React.jsを使用してユーザーインターフェースを開発する",
+      "priority": "high",
+      "dueDate": "2024-02-28",
+      "estimatedHours": 80,
+      "actualHours": 0,
+      "status": "pending",
+      "createdAt": "2024-01-15T09:30:00.000Z",
+      "updatedAt": "2024-01-15T09:30:00.000Z"
+    },
+    {
+      "id": "task_1703123456793_task005",
+      "projectId": "project_1703123456790_def456ghi",
+      "name": "現状分析",
+      "description": "既存ECサイトの課題と改善点を分析する",
+      "priority": "high",
+      "dueDate": "2024-02-15",
+      "estimatedHours": 12,
+      "actualHours": 0,
+      "status": "pending",
+      "createdAt": "2024-01-20T10:45:00.000Z",
+      "updatedAt": "2024-01-20T10:45:00.000Z"
+    },
+    {
+      "id": "task_1703123456794_task006",
+      "projectId": "project_1703123456790_def456ghi",
+      "name": "UI/UXデザイン",
+      "description": "新しいUI/UXデザインを作成する",
+      "priority": "medium",
+      "dueDate": "2024-03-15",
+      "estimatedHours": 40,
+      "actualHours": 0,
+      "status": "pending",
+      "createdAt": "2024-01-20T10:50:00.000Z",
+      "updatedAt": "2024-01-20T10:50:00.000Z"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "expense_1703123456789_exp001",
+      "projectId": "project_1703123456789_abc123def",
+      "date": "2024-01-15",
+      "amount": 50000,
+      "item": "開発環境構築",
+      "memo": "クラウドサーバーと開発ツールの初期設定費用",
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "expense_1703123456790_exp002",
+      "projectId": "project_1703123456789_abc123def",
+      "date": "2024-01-20",
+      "amount": 30000,
+      "item": "ライセンス費用",
+      "memo": "開発に必要なソフトウェアライセンス",
+      "createdAt": "2024-01-20T11:00:00.000Z"
+    },
+    {
+      "id": "expense_1703123456791_exp003",
+      "projectId": "project_1703123456789_abc123def",
+      "date": "2024-01-25",
+      "amount": 15000,
+      "item": "書籍・資料購入",
+      "memo": "技術書とオンラインコースの購入",
+      "createdAt": "2024-01-25T14:00:00.000Z"
+    },
+    {
+      "id": "expense_1703123456792_exp004",
+      "projectId": "project_1703123456790_def456ghi",
+      "date": "2024-01-22",
+      "amount": 25000,
+      "item": "デザインツール",
+      "memo": "Figma Proライセンスとデザインアセット",
+      "createdAt": "2024-01-22T09:30:00.000Z"
+    },
+    {
+      "id": "expense_1703123456793_exp005",
+      "projectId": "project_1703123456791_ghi789jkl",
+      "date": "2024-01-10",
+      "amount": 100000,
+      "item": "サーバー移行費用",
+      "memo": "既存システムのクラウド移行",
+      "createdAt": "2024-01-10T16:00:00.000Z"
+    },
+    {
+      "id": "expense_1703123456794_exp006",
+      "projectId": "project_1703123456791_ghi789jkl",
+      "date": "2024-01-18",
+      "amount": 45000,
+      "item": "データベース最適化",
+      "memo": "パフォーマンス改善のためのDBチューニング",
+      "createdAt": "2024-01-18T13:15:00.000Z"
+    },
+    {
+      "id": "expense_1703123456795_exp007",
+      "projectId": "project_1703123456789_abc123def",
+      "date": "2024-01-28",
+      "amount": 20000,
+      "item": "テスト環境構築",
+      "memo": "QAテスト用の環境セットアップ",
+      "createdAt": "2024-01-28T10:45:00.000Z"
+    },
+    {
+      "id": "expense_1703123456796_exp008",
+      "projectId": "project_1703123456790_def456ghi",
+      "date": "2024-01-30",
+      "amount": 35000,
+      "item": "ユーザビリティテスト",
+      "memo": "外部ユーザーによるUI/UXテスト実施",
+      "createdAt": "2024-01-30T15:20:00.000Z"
+    }
+  ],
+  "settings": {
+    "theme": "light",
+    "language": "ja",
+    "currency": "JPY"
+  }
+}
