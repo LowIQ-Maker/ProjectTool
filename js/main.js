@@ -874,9 +874,8 @@ function handleTaskSubmit(e) {
         switchPage(currentPageId);
     }
     
-    // ダッシュボードも常に更新（サイドバーに表示されるため）
-    console.log('ダッシュボードも更新');
-    updateDashboard();
+    // ダッシュボードの更新は必要最小限に制限
+    // サイドバーの統計は個別に更新する
 }
 
 /**
@@ -963,9 +962,8 @@ function handleExpenseSubmit(e) {
         switchPage(currentPageId);
     }
     
-    // ダッシュボードも常に更新（サイドバーに表示されるため）
-    console.log('ダッシュボードも更新');
-    updateDashboard();
+    // ダッシュボードの更新は必要最小限に制限
+    // サイドバーの統計は個別に更新する
 }
 
 /**
