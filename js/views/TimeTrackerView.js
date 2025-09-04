@@ -495,11 +495,20 @@ class TimeTrackerView {
     }
 
     destroy() {
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-        }
-        if (this.weeklyChart) {
-            this.weeklyChart.destroy();
+        try {
+            if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+                this.updateInterval = null;
+            }
+            
+            if (this.weeklyChart) {
+                this.weeklyChart.destroy();
+                this.weeklyChart = null;
+            }
+            
+            console.log('TimeTrackerView: 破棄完了');
+        } catch (error) {
+            console.error('TimeTrackerView.destroy: エラーが発生しました:', error);
         }
     }
 }
