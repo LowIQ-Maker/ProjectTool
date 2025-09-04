@@ -427,6 +427,8 @@ class TimeTrackerView {
         document.getElementById('history-task-filter')?.addEventListener('change', (e) => {
             this.filterHistory();
         });
+        
+        console.log('TimeTrackerView.bindEvents: 完了');
     }
 
     pauseTimer(taskId) {
