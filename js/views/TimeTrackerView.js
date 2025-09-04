@@ -427,16 +427,18 @@ class TimeTrackerView {
         try {
             console.log('TimeTrackerView.bindEvents: 開始');
             
-            // タブ切り替え
-            const tabButtons = document.querySelectorAll('.tab-btn');
+            // タブ切り替え（TimeTrackerView内のタブのみ）
+            const tabButtons = document.querySelectorAll('#time-tracking .tab-btn');
             console.log('TimeTrackerView.bindEvents: タブボタン数:', tabButtons.length);
             tabButtons.forEach(btn => {
                 console.log('TimeTrackerView.bindEvents: タブボタン:', btn, 'data-view:', btn.getAttribute('data-view'));
             });
             
             document.addEventListener('click', (e) => {
-                if (e.target.closest('.tab-btn')) {
-                    const btn = e.target.closest('.tab-btn');
+                // TimeTrackerView内のタブボタンのみを処理
+                const tabBtn = e.target.closest('#time-tracking .tab-btn');
+                if (tabBtn) {
+                    const btn = tabBtn;
                     console.log('TimeTrackerView.bindEvents: ボタン要素:', btn);
                     console.log('TimeTrackerView.bindEvents: dataset:', btn.dataset);
                     console.log('TimeTrackerView.bindEvents: data-view属性:', btn.getAttribute('data-view'));
