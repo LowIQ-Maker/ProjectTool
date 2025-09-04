@@ -20,7 +20,7 @@ $action = {
     $changeType = $Event.SourceEventArgs.ChangeType
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     
-    Write-Host "[$timestamp] $changeType: $path" -ForegroundColor Cyan
+    Write-Host "[$timestamp] $changeType : $path" -ForegroundColor Cyan
     
     # 少し待ってからGit操作を実行（ファイルの書き込み完了を待つ）
     Start-Sleep -Seconds 2
@@ -36,7 +36,8 @@ $action = {
             git add .
             
             # コミット
-            $commitMessage = "Auto-commit: $changeType - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            $commitMessage = "Auto-commit: $changeType - $timestamp"
             git commit -m $commitMessage
             
             Write-Host "コミット完了: $commitMessage" -ForegroundColor Green
