@@ -141,7 +141,7 @@ class AnalyticsView {
                 return;
             }
 
-            const projects = Storage.getProjects();
+            const projects = this.analyticsHelper.storage.getProjects();
             console.log('AnalyticsView.populateProjectSelector: プロジェクト数:', projects.length);
             
             projects.forEach(project => {
@@ -211,7 +211,7 @@ class AnalyticsView {
 
     loadOverallAnalytics() {
         // 全体的な分析データを読み込み
-        const projects = Storage.getProjects();
+        const projects = this.analyticsHelper.storage.getProjects();
         if (projects.length === 0) return;
 
         // 平均ヘルススコアを計算
@@ -229,7 +229,7 @@ class AnalyticsView {
             return;
         }
 
-        const project = Storage.getProject(this.currentProjectId);
+        const project = this.analyticsHelper.storage.getProject(this.currentProjectId);
         if (!project) return;
 
         // ヘルススコアを更新
@@ -313,8 +313,8 @@ class AnalyticsView {
     updateRiskAnalysis() {
         if (!this.currentProjectId) return;
 
-        const project = Storage.getProject(this.currentProjectId);
-        const tasks = Storage.getTasks().filter(t => t.projectId === this.currentProjectId);
+        const project = this.analyticsHelper.storage.getProject(this.currentProjectId);
+        const tasks = this.analyticsHelper.storage.getTasks().filter(t => t.projectId === this.currentProjectId);
         const criticalTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'completed');
         const overdueTasks = tasks.filter(t => {
             if (t.status === 'completed') return false;
@@ -477,6 +477,17 @@ class AnalyticsView {
     renderProductivityChart(data) {
         try {
             console.log('AnalyticsView.renderProductivityChart: 開始', data);
+            
+            // Chart.jsの可用性をチェック
+            if (typeof Chart === 'undefined') {
+                console.error('AnalyticsView.renderProductivityChart: Chart.jsが読み込まれていません');
+                const ctx = document.getElementById('productivityChart');
+                if (ctx) {
+                    ctx.innerHTML = '<p class="error">Chart.jsの読み込みに失敗しました。ページを再読み込みしてください。</p>';
+                }
+                return;
+            }
+            
             const ctx = document.getElementById('productivityChart');
             if (!ctx) {
                 console.error('AnalyticsView.renderProductivityChart: productivityChartキャンバスが見つかりません');
@@ -518,12 +529,27 @@ class AnalyticsView {
             console.log('AnalyticsView.renderProductivityChart: 完了');
         } catch (error) {
             console.error('AnalyticsView.renderProductivityChart: エラーが発生しました:', error);
+            const ctx = document.getElementById('productivityChart');
+            if (ctx) {
+                ctx.innerHTML = '<p class="error">グラフの表示に失敗しました: ' + error.message + '</p>';
+            }
         }
     }
 
     renderBudgetChart(data) {
         try {
             console.log('AnalyticsView.renderBudgetChart: 開始', data);
+            
+            // Chart.jsの可用性をチェック
+            if (typeof Chart === 'undefined') {
+                console.error('AnalyticsView.renderBudgetChart: Chart.jsが読み込まれていません');
+                const ctx = document.getElementById('budgetChart');
+                if (ctx) {
+                    ctx.innerHTML = '<p class="error">Chart.jsの読み込みに失敗しました。ページを再読み込みしてください。</p>';
+                }
+                return;
+            }
+            
             const ctx = document.getElementById('budgetChart');
             if (!ctx) {
                 console.error('AnalyticsView.renderBudgetChart: budgetChartキャンバスが見つかりません');
@@ -564,6 +590,10 @@ class AnalyticsView {
             console.log('AnalyticsView.renderBudgetChart: 完了');
         } catch (error) {
             console.error('AnalyticsView.renderBudgetChart: エラーが発生しました:', error);
+            const ctx = document.getElementById('budgetChart');
+            if (ctx) {
+                ctx.innerHTML = '<p class="error">グラフの表示に失敗しました: ' + error.message + '</p>';
+            }
         }
     }
 
