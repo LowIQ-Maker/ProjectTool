@@ -1962,6 +1962,7 @@ function initTimeTracking() {
             window.timeTrackerView.destroy();
         }
         window.timeTrackerView = new TimeTrackerView();
+        window.timeTrackerView.init();
         console.log('タイムトラッキングが初期化されました');
     } catch (error) {
         console.error('タイムトラッキングの初期化エラー:', error);
