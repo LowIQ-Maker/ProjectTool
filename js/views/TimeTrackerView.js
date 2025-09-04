@@ -74,6 +74,11 @@ class TimeTrackerView {
             `;
 
             this.showCurrentView();
+            
+            // 生成されたHTMLの確認
+            const allPanes = document.querySelectorAll('.view-pane');
+            console.log('TimeTrackerView.render: 生成されたビューペイン:', Array.from(allPanes).map(pane => pane.id));
+            
             console.log('TimeTrackerView.render: 完了');
         } catch (error) {
             console.error('TimeTrackerView.render: エラーが発生しました:', error);
@@ -91,7 +96,7 @@ class TimeTrackerView {
             
             if (activeTimers.length === 0) {
                 return `
-                    <div id="active-timers-view" class="view-pane">
+                    <div id="active-view" class="view-pane">
                         <div class="no-active-timers">
                             <i class="fas fa-clock"></i>
                             <p>現在アクティブなタイマーはありません</p>
@@ -102,7 +107,7 @@ class TimeTrackerView {
             }
 
             return `
-                <div id="active-timers-view" class="view-pane">
+                <div id="active-view" class="view-pane">
                     <div class="active-timers-list">
                         ${activeTimers.map(timer => `
                             <div class="timer-card" data-task-id="${timer.taskId}">
@@ -295,6 +300,9 @@ class TimeTrackerView {
                 console.log('TimeTrackerView.showCurrentView: ビューペインを表示:', currentPane.id);
             } else {
                 console.error('TimeTrackerView.showCurrentView: ビューペインが見つかりません:', `${this.currentView}-view`);
+                // 利用可能なビューペインを確認
+                const allPanes = document.querySelectorAll('.view-pane');
+                console.log('TimeTrackerView.showCurrentView: 利用可能なビューペイン:', Array.from(allPanes).map(pane => pane.id));
             }
 
             // タブのアクティブ状態を更新
