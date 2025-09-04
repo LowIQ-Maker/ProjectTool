@@ -49,6 +49,15 @@ function initApp() {
         // 分析ページの初期化
         initAnalyticsPage();
         
+        // タイムトラッキングの初期化
+        initTimeTracking();
+        
+        // レポート機能の初期化
+        initReports();
+        
+        // 通知管理の初期化
+        initNotifications();
+        
         
     }
 
@@ -1932,6 +1941,51 @@ function initAnalyticsPage() {
         console.log('分析ページが初期化されました');
     } catch (error) {
         console.error('分析ページの初期化エラー:', error);
+    }
+}
+
+/**
+ * タイムトラッキングの初期化
+ */
+function initTimeTracking() {
+    try {
+        if (window.timeTrackerView) {
+            window.timeTrackerView.destroy();
+        }
+        window.timeTrackerView = new TimeTrackerView();
+        console.log('タイムトラッキングが初期化されました');
+    } catch (error) {
+        console.error('タイムトラッキングの初期化エラー:', error);
+    }
+}
+
+/**
+ * レポート機能の初期化
+ */
+function initReports() {
+    try {
+        if (window.reportView) {
+            window.reportView.destroy();
+        }
+        window.reportView = new ReportView();
+        console.log('レポート機能が初期化されました');
+    } catch (error) {
+        console.error('レポート機能の初期化エラー:', error);
+    }
+}
+
+/**
+ * 通知管理の初期化
+ */
+function initNotifications() {
+    try {
+        if (window.notificationManager) {
+            window.notificationManager.destroy();
+        }
+        window.notificationManager = new NotificationManager();
+        console.log('通知管理が初期化されました');
+    } catch (error) {
+        console.error('通知管理の初期化エラー:', error);
     }
 }
 
