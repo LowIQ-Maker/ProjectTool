@@ -1996,6 +1996,15 @@ function initAnalyticsPage() {
             window.analyticsView.destroy();
         }
         window.analyticsView = new AnalyticsView();
+        
+        // 予算分析を強制的に表示
+        setTimeout(() => {
+            if (window.analyticsView && window.analyticsView.switchTab) {
+                window.analyticsView.switchTab('budget');
+                console.log('分析ページ: 予算分析タブを強制表示しました');
+            }
+        }, 500);
+        
         console.log('分析ページが初期化されました');
     } catch (error) {
         console.error('分析ページの初期化エラー:', error);

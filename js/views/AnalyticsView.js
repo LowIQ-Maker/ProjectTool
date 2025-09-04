@@ -14,13 +14,17 @@ class AnalyticsView {
         try {
             console.log('AnalyticsView.init: 開始');
             this.render();
+            
             // DOM要素が作成された後にイベントをバインド
             setTimeout(() => {
                 this.bindEvents();
                 this.loadAnalytics();
+                
                 // 予算分析タブをデフォルトで表示
-                this.loadBudgetData();
-            }, 100);
+                this.switchTab('budget');
+                console.log('AnalyticsView.init: 予算分析タブをデフォルトで表示しました');
+            }, 200);
+            
             console.log('AnalyticsView.init: 完了');
         } catch (error) {
             console.error('AnalyticsView.init: エラーが発生しました:', error);
@@ -467,10 +471,10 @@ class AnalyticsView {
                 const currentDate = new Date();
                 const testData = [];
                 
-                for (let i = 0; i < 6; i++) {
+                for (let i = 5; i >= 0; i--) {
                     const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                    testData.unshift({
+                    testData.push({
                         month: monthKey,
                         totalExpense: Math.floor(Math.random() * 100000) + 50000
                     });
@@ -703,24 +707,25 @@ class AnalyticsView {
             const container = ctx.parentElement;
             if (container) {
                 // コンテナのサイズを設定
-                container.style.height = '400px';
+                container.style.height = '350px';
                 container.style.width = '100%';
                 container.style.position = 'relative';
                 container.style.overflow = 'hidden';
+                container.style.display = 'block';
                 
                 // キャンバスのサイズを強制的に設定
                 ctx.width = 800;
-                ctx.height = 400;
+                ctx.height = 350;
                 ctx.style.width = '100%';
-                ctx.style.height = '400px';
+                ctx.style.height = '350px';
                 ctx.style.display = 'block';
                 ctx.style.maxWidth = '100%';
-                ctx.style.maxHeight = '400px';
+                ctx.style.maxHeight = '350px';
                 ctx.style.boxSizing = 'border-box';
                 
                 // キャンバスの属性も設定
                 ctx.setAttribute('width', '800');
-                ctx.setAttribute('height', '400');
+                ctx.setAttribute('height', '350');
                 
                 console.log('AnalyticsView.renderBudgetChart: キャンバスサイズを設定しました');
                 console.log('AnalyticsView.renderBudgetChart: キャンバスサイズ:', ctx.width, 'x', ctx.height);
