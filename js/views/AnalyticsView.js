@@ -11,110 +11,125 @@ class AnalyticsView {
     }
 
     init() {
-        this.render();
-        this.bindEvents();
-        this.loadAnalytics();
+        try {
+            console.log('AnalyticsView.init: 開始');
+            this.render();
+            this.bindEvents();
+            this.loadAnalytics();
+            console.log('AnalyticsView.init: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.init: エラーが発生しました:', error);
+        }
     }
 
     render() {
-        const analyticsSection = document.getElementById('analytics');
-        if (!analyticsSection) return;
+        try {
+            console.log('AnalyticsView.render: 開始');
+            const analyticsSection = document.getElementById('analytics');
+            if (!analyticsSection) {
+                console.error('AnalyticsView.render: analyticsセクションが見つかりません');
+                return;
+            }
 
-        analyticsSection.innerHTML = `
-            <div class="analytics-header">
-                <h2><i class="fas fa-chart-line"></i> 高度な分析</h2>
-                <div class="analytics-controls">
-                    <select id="projectSelector" class="form-select">
-                        <option value="">すべてのプロジェクト</option>
-                    </select>
-                    <button id="refreshAnalytics" class="btn btn-secondary">
-                        <i class="fas fa-sync-alt"></i> 更新
-                    </button>
-                </div>
-            </div>
-
-            <div class="analytics-grid">
-                <!-- プロジェクトヘルススコア -->
-                <div class="analytics-card health-score">
-                    <h3>プロジェクトヘルススコア</h3>
-                    <div class="health-score-display">
-                        <div class="score-circle">
-                            <span id="healthScore">-</span>
-                            <small>/100</small>
-                        </div>
-                        <div class="health-indicator">
-                            <span id="healthStatus">-</span>
-                        </div>
+            analyticsSection.innerHTML = `
+                <div class="analytics-header">
+                    <h2><i class="fas fa-chart-line"></i> 高度な分析</h2>
+                    <div class="analytics-controls">
+                        <select id="projectSelector" class="form-select">
+                            <option value="">すべてのプロジェクト</option>
+                        </select>
+                        <button id="refreshAnalytics" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i> 更新
+                        </button>
                     </div>
                 </div>
 
-                <!-- 進捗予測 -->
-                <div class="analytics-card progress-prediction">
-                    <h3>進捗予測</h3>
-                    <div id="progressPredictionContent">
-                        <p class="no-data">プロジェクトを選択してください</p>
-                    </div>
-                </div>
-
-                <!-- リスク分析 -->
-                <div class="analytics-card risk-analysis">
-                    <h3>リスク分析</h3>
-                    <div id="riskAnalysisContent">
-                        <p class="no-data">プロジェクトを選択してください</p>
-                    </div>
-                </div>
-
-                <!-- 効率性分析 -->
-                <div class="analytics-card efficiency-analysis">
-                    <h3>効率性分析</h3>
-                    <div id="efficiencyContent">
-                        <p class="no-data">プロジェクトを選択してください</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 詳細分析セクション -->
-            <div class="detailed-analytics">
-                <div class="analytics-tabs">
-                    <button class="tab-btn active" data-tab="productivity">生産性分析</button>
-                    <button class="tab-btn" data-tab="budget">予算分析</button>
-                    <button class="tab-btn" data-tab="dependencies">依存関係</button>
-                    <button class="tab-btn" data-tab="suggestions">改善提案</button>
-                </div>
-
-                <div class="tab-content">
-                    <!-- 生産性分析タブ -->
-                    <div id="productivityTab" class="tab-pane active">
-                        <div class="chart-container">
-                            <canvas id="productivityChart"></canvas>
+                <div class="analytics-grid">
+                    <!-- プロジェクトヘルススコア -->
+                    <div class="analytics-card health-score">
+                        <h3>プロジェクトヘルススコア</h3>
+                        <div class="health-score-display">
+                            <div class="score-circle">
+                                <span id="healthScore">-</span>
+                                <small>/100</small>
+                            </div>
+                            <div class="health-indicator">
+                                <span id="healthStatus">-</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 予算分析タブ -->
-                    <div id="budgetTab" class="tab-pane">
-                        <div class="chart-container">
-                            <canvas id="budgetChart"></canvas>
+                    <!-- 進捗予測 -->
+                    <div class="analytics-card progress-prediction">
+                        <h3>進捗予測</h3>
+                        <div id="progressPredictionContent">
+                            <p class="no-data">プロジェクトを選択してください</p>
                         </div>
                     </div>
 
-                    <!-- 依存関係タブ -->
-                    <div id="dependenciesTab" class="tab-pane">
-                        <div id="dependenciesContent">
-                            <p class="no-data">データを読み込み中...</p>
+                    <!-- リスク分析 -->
+                    <div class="analytics-card risk-analysis">
+                        <h3>リスク分析</h3>
+                        <div id="riskAnalysisContent">
+                            <p class="no-data">プロジェクトを選択してください</p>
                         </div>
                     </div>
 
-                    <!-- 改善提案タブ -->
-                    <div id="suggestionsTab" class="tab-pane">
-                        <div id="suggestionsContent">
-                            <p class="no-data">データを読み込み中...</p>
+                    <!-- 効率性分析 -->
+                    <div class="analytics-card efficiency-analysis">
+                        <h3>効率性分析</h3>
+                        <div id="efficiencyContent">
+                            <p class="no-data">プロジェクトを選択してください</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        `;
 
-        this.populateProjectSelector();
+                <!-- 詳細分析セクション -->
+                <div class="detailed-analytics">
+                    <div class="analytics-tabs">
+                        <button class="tab-btn active" data-tab="productivity">生産性分析</button>
+                        <button class="tab-btn" data-tab="budget">予算分析</button>
+                        <button class="tab-btn" data-tab="dependencies">依存関係</button>
+                        <button class="tab-btn" data-tab="suggestions">改善提案</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- 生産性分析タブ -->
+                        <div id="productivityTab" class="tab-pane active">
+                            <div class="chart-container">
+                                <canvas id="productivityChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- 予算分析タブ -->
+                        <div id="budgetTab" class="tab-pane">
+                            <div class="chart-container">
+                                <canvas id="budgetChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- 依存関係タブ -->
+                        <div id="dependenciesTab" class="tab-pane">
+                            <div id="dependenciesContent">
+                                <p class="no-data">データを読み込み中...</p>
+                            </div>
+                        </div>
+
+                        <!-- 改善提案タブ -->
+                        <div id="suggestionsTab" class="tab-pane">
+                            <div id="suggestionsContent">
+                                <p class="no-data">データを読み込み中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            this.populateProjectSelector();
+            console.log('AnalyticsView.render: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.render: エラーが発生しました:', error);
+        }
     }
 
     populateProjectSelector() {

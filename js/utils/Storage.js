@@ -95,6 +95,14 @@ class Storage {
     }
 
     /**
+     * 特定のプロジェクトを取得
+     */
+    getProject(projectId) {
+        const projects = this.getProjects();
+        return projects.find(p => p.id === projectId);
+    }
+
+    /**
      * プロジェクトを追加
      */
     addProject(project) {
