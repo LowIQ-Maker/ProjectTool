@@ -73,7 +73,11 @@ class ProjectView {
                 <td>
                     <div class="project-name">
                         <strong>${project.name}</strong>
-                        <small>${project.description || '説明なし'}</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="project-description">
+                        ${project.description || '説明なし'}
                     </div>
                 </td>
                 <td>${project.startDate}</td>
@@ -204,7 +208,11 @@ class ProjectView {
                 <td>
                     <div class="project-name">
                         <strong>${project.name}</strong>
-                        <small>${project.description || '説明なし'}</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="project-description">
+                        ${project.description || '説明なし'}
                     </div>
                 </td>
                 <td>${project.startDate}</td>
