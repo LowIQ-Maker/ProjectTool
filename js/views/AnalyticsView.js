@@ -768,6 +768,15 @@ class AnalyticsView {
     destroy() {
         // チャートを破棄
         this.clearCharts();
+        
+        // キャンバス要素の内容をクリア
+        const canvasIds = ['productivityChart', 'budgetChart'];
+        canvasIds.forEach(id => {
+            const canvas = document.getElementById(id);
+            if (canvas) {
+                canvas.innerHTML = '';
+            }
+        });
     }
 }
 
