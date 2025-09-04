@@ -698,9 +698,15 @@ class AnalyticsView {
 
             // データが空の場合の処理
             if (!data || data.length === 0) {
+                console.warn('AnalyticsView.renderBudgetChart: データが空です');
                 ctx.innerHTML = '<p class="no-data">支出データがありません</p>';
                 return;
             }
+            
+            console.log('AnalyticsView.renderBudgetChart: チャート描画開始');
+            console.log('AnalyticsView.renderBudgetChart: データ件数:', data.length);
+            console.log('AnalyticsView.renderBudgetChart: ラベル:', data.map(d => d.month));
+            console.log('AnalyticsView.renderBudgetChart: 値:', data.map(d => d.totalExpense));
 
             this.charts.budget = new Chart(ctx, {
                 type: 'line',
@@ -740,6 +746,7 @@ class AnalyticsView {
                     }
                 }
             });
+            console.log('AnalyticsView.renderBudgetChart: チャート作成完了');
             console.log('AnalyticsView.renderBudgetChart: 完了');
         } catch (error) {
             console.error('AnalyticsView.renderBudgetChart: エラーが発生しました:', error);

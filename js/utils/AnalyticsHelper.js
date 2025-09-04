@@ -148,29 +148,54 @@ class AnalyticsHelper {
      * 予算トレンドの分析
      */
     analyzeBudgetTrends() {
-        const projects = this.storage.getProjects();
-        const expenses = this.storage.getExpenses();
-        
-        // 月別の支出データを集計
-        const monthlyExpenses = {};
-        
-        expenses.forEach(expense => {
-            const date = new Date(expense.date);
-            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        try {
+            console.log('AnalyticsHelper.analyzeBudgetTrends: 開始');
             
-            if (!monthlyExpenses[monthKey]) {
-                monthlyExpenses[monthKey] = 0;
-            }
-            monthlyExpenses[monthKey] += expense.amount;
-        });
-        
-        // 月別データを配列に変換
-        const budgetData = Object.keys(monthlyExpenses).map(month => ({
-            month: month,
-            totalExpense: monthlyExpenses[month]
-        })).sort((a, b) => a.month.localeCompare(b.month));
-        
-        return budgetData;
+            const projects = this.storage.getProjects();
+            const expenses = this.storage.getExpenses();
+            
+            console.log('AnalyticsHelper.analyzeBudgetTrends: プロジェクト数:', projects.length);
+            console.log('AnalyticsHelper.analyzeBudgetTrends: 支出数:', expenses.length);
+            console.log('AnalyticsHelper.analyzeBudgetTrends: 支出データ:', expenses);
+            
+            // 月別の支出データを集計
+            const monthlyExpenses = {};
+            
+            expenses.forEach(expense => {
+                console.log('AnalyticsHelper.analyzeBudgetTrends: 支出処理中:', expense);
+                const date = new Date(expense.date);
+                console.log('AnalyticsHelper.analyzeBudgetTrends: 日付:', expense.date, '→', date);
+                
+                if (isNaN(date.getTime())) {
+                    console.warn('AnalyticsHelper.analyzeBudgetTrends: 無効な日付が検出されました:', expense.date);
+                    return;
+                }
+                
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                console.log('AnalyticsHelper.analyzeBudgetTrends: 月キー:', monthKey);
+                
+                if (!monthlyExpenses[monthKey]) {
+                    monthlyExpenses[monthKey] = 0;
+                }
+                monthlyExpenses[monthKey] += expense.amount;
+                console.log('AnalyticsHelper.analyzeBudgetTrends: 月別集計更新:', monthKey, '=', monthlyExpenses[monthKey]);
+            });
+            
+            console.log('AnalyticsHelper.analyzeBudgetTrends: 月別集計結果:', monthlyExpenses);
+            
+            // 月別データを配列に変換
+            const budgetData = Object.keys(monthlyExpenses).map(month => ({
+                month: month,
+                totalExpense: monthlyExpenses[month]
+            })).sort((a, b) => a.month.localeCompare(b.month));
+            
+            console.log('AnalyticsHelper.analyzeBudgetTrends: 最終結果:', budgetData);
+            return budgetData;
+            
+        } catch (error) {
+            console.error('AnalyticsHelper.analyzeBudgetTrends: エラーが発生しました:', error);
+            return [];
+        }
     }
 
     /**
