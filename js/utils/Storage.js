@@ -431,6 +431,9 @@ class Storage {
             }
         });
         
+        // 追加の整合性チェック
+        this.performAdvancedValidation(projects, tasks, expenses, errors, warnings);
+        
         return {
             isValid: errors.length === 0,
             errors: errors,
@@ -443,6 +446,64 @@ class Storage {
                 warningCount: warnings.length
             }
         };
+    }
+
+    performAdvancedValidation(projects, tasks, expenses, errors, warnings) {
+        // プロジェクトの進捗率チェック
+        projects.forEach(project => {
+            if (project.progress !== undefined) {
+                if (project.progress < 0 || project.progress > 100) {
+                    errors.push(`プロジェクト "${project.name}" の進捗率が範囲外です (${project.progress}%)`);
+                }
+            }
+        });
+
+        // タスクの依存関係チェック
+        tasks.forEach(task => {
+            if (task.dependencies && Array.isArray(task.dependencies)) {
+                task.dependencies.forEach(depId => {
+                    const depTask = tasks.find(t => t.id === depId);
+                    if (!depTask) {
+                        errors.push(`タスク "${task.name}" の依存タスク "${depId}" が見つかりません`);
+                    }
+                });
+            }
+        });
+
+        // 予算と支出の整合性チェック
+        projects.forEach(project => {
+            if (project.budget !== undefined) {
+                const projectExpenses = expenses.filter(e => e.projectId === project.id);
+                const totalExpenses = projectExpenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+                
+                if (totalExpenses > project.budget) {
+                    warnings.push(`プロジェクト "${project.name}" の支出が予算を超過しています (予算: ¥${project.budget.toLocaleString()}, 支出: ¥${totalExpenses.toLocaleString()})`);
+                }
+            }
+        });
+
+        // 日付の論理チェック
+        projects.forEach(project => {
+            if (project.startDate && project.endDate) {
+                const startDate = new Date(project.startDate);
+                const endDate = new Date(project.endDate);
+                
+                if (startDate >= endDate) {
+                    errors.push(`プロジェクト "${project.name}" の開始日が終了日より後になっています`);
+                }
+            }
+        });
+
+        tasks.forEach(task => {
+            if (task.dueDate) {
+                const dueDate = new Date(task.dueDate);
+                const now = new Date();
+                
+                if (dueDate < now && task.status !== 'completed') {
+                    warnings.push(`タスク "${task.name}" の期限が過ぎています`);
+                }
+            }
+        });
     }
 }
 

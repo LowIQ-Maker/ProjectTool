@@ -30,6 +30,7 @@ class NotificationManager {
             type,
             timestamp: new Date(),
             read: false,
+            priority: options.priority || this.getDefaultPriority(type),
             ...options
         };
 
@@ -47,6 +48,21 @@ class NotificationManager {
         }
 
         return notification.id;
+    }
+
+    // 通知タイプに応じたデフォルト優先度を取得
+    getDefaultPriority(type) {
+        const priorities = {
+            'error': 'high',
+            'warning': 'medium',
+            'success': 'low',
+            'info': 'low',
+            'task': 'medium',
+            'project': 'medium',
+            'budget': 'high',
+            'deadline': 'high'
+        };
+        return priorities[type] || 'low';
     }
 
     // 成功通知

@@ -131,13 +131,21 @@ class ReportView {
 
     async generateReport(reportType) {
         try {
-            this.showLoading();
+            console.log('ReportView.generateReport: 開始', reportType);
+            this.showLoading('レポートを生成中...');
             
             // データを取得
             const projects = await this.getProjects();
             const tasks = await this.getTasks();
             const expenses = await this.getExpenses();
             const timeEntries = await this.getTimeEntries();
+            
+            console.log('ReportView.generateReport: データ取得完了', {
+                projects: projects.length,
+                tasks: tasks.length,
+                expenses: expenses.length,
+                timeEntries: timeEntries.length
+            });
 
             let report;
             switch (reportType) {

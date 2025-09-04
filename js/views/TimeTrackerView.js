@@ -98,6 +98,11 @@ class TimeTrackerView {
             console.log('TimeTrackerView.renderActiveTimers: アクティブタイマー数:', activeTimers.length);
             console.log('TimeTrackerView.renderActiveTimers: アクティブタイマー詳細:', activeTimers);
             
+            // プロジェクトとタスクの情報を取得
+            const storage = new Storage();
+            const projects = storage.getProjects();
+            const tasks = storage.getTasks();
+            
             if (activeTimers.length === 0) {
                 return `
                     <div id="active-view" class="view-pane">
@@ -113,32 +118,41 @@ class TimeTrackerView {
             return `
                 <div id="active-view" class="view-pane">
                     <div class="active-timers-list">
-                        ${activeTimers.map(timer => `
-                            <div class="timer-card" data-task-id="${timer.taskId}">
-                                <div class="timer-header">
-                                    <h3>${timer.taskName || '不明なタスク'}</h3>
-                                    <div class="timer-status running">
-                                        <i class="fas fa-play"></i> 実行中
+                        ${activeTimers.map(timer => {
+                            // タスク情報を取得
+                            const task = tasks.find(t => t.id === timer.taskId);
+                            const project = task ? projects.find(p => p.id === task.projectId) : null;
+                            
+                            return `
+                                <div class="timer-card" data-task-id="${timer.taskId}">
+                                    <div class="timer-header">
+                                        <h3>${task ? task.name : '不明なタスク'}</h3>
+                                        <div class="timer-status running">
+                                            <i class="fas fa-play"></i> 実行中
+                                        </div>
+                                    </div>
+                                    <div class="timer-project">
+                                        <small>プロジェクト: ${project ? project.name : '不明'}</small>
+                                    </div>
+                                    <div class="timer-display">
+                                        <div class="elapsed-time" data-task-id="${timer.taskId}">
+                                            ${this.timeTracker.formatTime(this.timeTracker.getElapsedTime(timer.taskId))}
+                                        </div>
+                                        <div class="timer-controls">
+                                            <button class="btn btn-sm btn-warning pause-timer" data-task-id="${timer.taskId}">
+                                                <i class="fas fa-pause"></i> 一時停止
+                                            </button>
+                                            <button class="btn btn-sm btn-danger stop-timer" data-task-id="${timer.taskId}">
+                                                <i class="fas fa-stop"></i> 停止
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="timer-info">
+                                        <small>開始時刻: ${timer.startTime ? timer.startTime.toLocaleTimeString() : '不明'}</small>
                                     </div>
                                 </div>
-                                <div class="timer-display">
-                                    <div class="elapsed-time" data-task-id="${timer.taskId}">
-                                        ${this.timeTracker.formatTime(this.timeTracker.getElapsedTime(timer.taskId))}
-                                    </div>
-                                    <div class="timer-controls">
-                                        <button class="btn btn-sm btn-warning pause-timer" data-task-id="${timer.taskId}">
-                                            <i class="fas fa-pause"></i> 一時停止
-                                        </button>
-                                        <button class="btn btn-sm btn-danger stop-timer" data-task-id="${timer.taskId}">
-                                            <i class="fas fa-stop"></i> 停止
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="timer-info">
-                                    <small>開始時刻: ${timer.startTime ? timer.startTime.toLocaleTimeString() : '不明'}</small>
-                                </div>
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             `;
