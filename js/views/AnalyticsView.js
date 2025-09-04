@@ -437,12 +437,35 @@ class AnalyticsView {
     loadBudgetData() {
         try {
             console.log('AnalyticsView.loadBudgetData: 開始');
+            
+            // データの詳細をログ出力
+            const storage = this.analyticsHelper.storage;
+            const projects = storage.getProjects();
+            const expenses = storage.getExpenses();
+            console.log('AnalyticsView.loadBudgetData: プロジェクト数:', projects.length);
+            console.log('AnalyticsView.loadBudgetData: 支出数:', expenses.length);
+            console.log('AnalyticsView.loadBudgetData: 支出データ詳細:', expenses);
+            
             const budgetData = this.analyticsHelper.analyzeBudgetTrends();
             console.log('AnalyticsView.loadBudgetData: データ取得完了', budgetData);
+            
+            if (!budgetData || budgetData.length === 0) {
+                console.warn('AnalyticsView.loadBudgetData: 予算データが空です');
+                const ctx = document.getElementById('budgetChart');
+                if (ctx) {
+                    ctx.innerHTML = '<p class="no-data">支出データがありません</p>';
+                }
+                return;
+            }
+            
             this.renderBudgetChart(budgetData);
             console.log('AnalyticsView.loadBudgetData: 完了');
         } catch (error) {
             console.error('AnalyticsView.loadBudgetData: エラーが発生しました:', error);
+            const ctx = document.getElementById('budgetChart');
+            if (ctx) {
+                ctx.innerHTML = '<p class="error">予算データの読み込みに失敗しました: ' + error.message + '</p>';
+            }
         }
     }
 
