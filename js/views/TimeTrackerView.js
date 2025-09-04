@@ -203,46 +203,59 @@ class TimeTrackerView {
     }
 
     renderSummary() {
-        const today = new Date();
-        const dailySummary = this.timeTracker.getDailyTimeSummary(today);
-        const weeklySummary = this.timeTracker.getWeeklyTimeSummary(today);
-        
-        const totalToday = Object.values(dailySummary).reduce((sum, task) => sum + task.totalTime, 0);
-        const totalWeek = Object.values(weeklySummary).reduce((sum, day) => sum + day.totalTime, 0);
+        try {
+            const today = new Date();
+            const dailySummary = this.timeTracker.getDailyTimeSummary(today);
+            const weeklySummary = this.timeTracker.getWeeklyTimeSummary(today);
+            
+            const totalToday = Object.values(dailySummary || {}).reduce((sum, task) => sum + (task.totalTime || 0), 0);
+            const totalWeek = Object.values(weeklySummary || {}).reduce((sum, day) => sum + (day.totalTime || 0), 0);
 
-        return `
-            <div id="summary-view" class="view-pane">
-                <div class="summary-overview">
-                    <div class="summary-card">
-                        <h3>今日の合計</h3>
-                        <div class="summary-value">${this.timeTracker.formatTime(totalToday)}</div>
+            console.log('TimeTrackerView.renderSummary: 今日の合計:', totalToday, '今週の合計:', totalWeek);
+
+            return `
+                <div id="summary-view" class="view-pane">
+                    <div class="summary-overview">
+                        <div class="summary-card">
+                            <h3>今日の合計</h3>
+                            <div class="summary-value">${this.timeTracker.formatTime(totalToday)}</div>
+                        </div>
+                        <div class="summary-card">
+                            <h3>今週の合計</h3>
+                            <div class="summary-value">${this.timeTracker.formatTime(totalWeek)}</div>
+                        </div>
                     </div>
-                    <div class="summary-card">
-                        <h3>今週の合計</h3>
-                        <div class="summary-value">${this.timeTracker.formatTime(totalWeek)}</div>
+
+                    <div class="summary-details">
+                        <div class="daily-breakdown">
+                            <h4>今日の内訳</h4>
+                            ${Object.keys(dailySummary || {}).length === 0 ? `
+                                <p class="no-data">今日の記録がありません</p>
+                            ` : Object.entries(dailySummary || {}).map(([taskId, task]) => `
+                                <div class="task-summary">
+                                    <span class="task-name">${task.taskName || '不明なタスク'}</span>
+                                    <span class="task-time">${this.timeTracker.formatTime(task.totalTime || 0)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="weekly-chart">
+                            <h4>今週の推移</h4>
+                            <canvas id="weekly-time-chart"></canvas>
+                        </div>
                     </div>
                 </div>
-
-                <div class="summary-details">
-                    <div class="daily-breakdown">
-                        <h4>今日の内訳</h4>
-                        ${Object.keys(dailySummary).length === 0 ? `
-                            <p class="no-data">今日の記録がありません</p>
-                        ` : Object.entries(dailySummary).map(([taskId, task]) => `
-                            <div class="task-summary">
-                                <span class="task-name">${task.taskName}</span>
-                                <span class="task-time">${this.timeTracker.formatTime(task.totalTime)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="weekly-chart">
-                        <h4>今週の推移</h4>
-                        <canvas id="weekly-time-chart"></canvas>
+            `;
+        } catch (error) {
+            console.error('TimeTrackerView.renderSummary: エラーが発生しました:', error);
+            return `
+                <div id="summary-view" class="view-pane">
+                    <div class="error">
+                        <p>サマリーの表示に失敗しました</p>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     showCurrentView() {
@@ -342,10 +355,16 @@ class TimeTrackerView {
     }
 
     getUniqueTaskOptions() {
-        const uniqueTasks = [...new Set(this.timeTracker.timeEntries.map(entry => entry.taskName))];
-        return uniqueTasks.map(taskName => 
-            `<option value="${taskName}">${taskName}</option>`
-        ).join('');
+        try {
+            const timeEntries = this.timeTracker.timeEntries || [];
+            const uniqueTasks = [...new Set(timeEntries.map(entry => entry.taskName).filter(name => name))];
+            return uniqueTasks.map(taskName => 
+                `<option value="${taskName}">${taskName}</option>`
+            ).join('');
+        } catch (error) {
+            console.error('TimeTrackerView.getUniqueTaskOptions: エラーが発生しました:', error);
+            return '';
+        }
     }
 
     bindEvents() {
