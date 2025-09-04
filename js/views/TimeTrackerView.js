@@ -11,6 +11,9 @@ class TimeTrackerView {
     init() {
         try {
             console.log('TimeTrackerView.init: 開始');
+            console.log('TimeTrackerView.init: TimeTrackerインスタンス:', this.timeTracker);
+            console.log('TimeTrackerView.init: アクティブタイマー数:', this.timeTracker.getActiveTimers().length);
+            console.log('TimeTrackerView.init: 時間エントリ数:', this.timeTracker.timeEntries.length);
             this.render();
             this.bindEvents();
             this.startUpdateTimer();
@@ -28,6 +31,11 @@ class TimeTrackerView {
         }
 
         try {
+            console.log('TimeTrackerView.render: 開始');
+            console.log('TimeTrackerView.render: TimeTrackerインスタンス:', this.timeTracker);
+            console.log('TimeTrackerView.render: アクティブタイマー数:', this.timeTracker.getActiveTimers().length);
+            console.log('TimeTrackerView.render: 時間エントリ数:', this.timeTracker.timeEntries.length);
+            
             container.innerHTML = `
                 <div class="time-tracking-header">
                     <h2><i class="fas fa-clock"></i> タイムトラッキング</h2>
