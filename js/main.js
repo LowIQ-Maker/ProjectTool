@@ -150,7 +150,7 @@ function initNavigation() {
             switchPage(targetId);
             
             // ページタイトルの更新
-            const pageTitle = document.querySelector('.page-title');
+            const pageTitle = document.getElementById('pageTitle');
             if (pageTitle) {
                 const title = this.querySelector('span')?.textContent || 'ダッシュボード';
                 pageTitle.textContent = title;
@@ -190,6 +190,9 @@ function switchPage(pageId) {
     const targetSection = document.getElementById(pageId);
     if (targetSection) {
         targetSection.classList.add('active');
+        
+        // ページタイトルの更新
+        updatePageTitle(pageId);
         
         // ページ固有の初期化処理
         switch (pageId) {

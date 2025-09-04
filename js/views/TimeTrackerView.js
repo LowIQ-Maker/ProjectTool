@@ -5,6 +5,7 @@ class TimeTrackerView {
         this.updateInterval = null;
         this.currentView = 'active'; // 'active', 'history', 'summary'
         this.weeklyChart = null;
+        // init()は外部から呼び出されるため、コンストラクタでは呼ばない
     }
 
     init() {
