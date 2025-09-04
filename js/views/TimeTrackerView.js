@@ -287,6 +287,13 @@ class TimeTrackerView {
         try {
             console.log('TimeTrackerView.showCurrentView: 開始');
             console.log('TimeTrackerView.showCurrentView: 現在のビュー:', this.currentView);
+            console.log('TimeTrackerView.showCurrentView: currentViewの型:', typeof this.currentView);
+            
+            // currentViewがundefinedの場合はデフォルト値を設定
+            if (!this.currentView) {
+                console.warn('TimeTrackerView.showCurrentView: currentViewがundefinedです。デフォルト値「active」を設定します');
+                this.currentView = 'active';
+            }
             
             // すべてのビューを非表示
             document.querySelectorAll('.view-pane').forEach(pane => {
@@ -420,9 +427,18 @@ class TimeTrackerView {
             document.addEventListener('click', (e) => {
                 if (e.target.closest('.tab-btn')) {
                     const btn = e.target.closest('.tab-btn');
-                    this.currentView = btn.dataset.view;
-                    console.log('TimeTrackerView.bindEvents: タブ切り替え:', this.currentView);
-                    this.showCurrentView();
+                    console.log('TimeTrackerView.bindEvents: ボタン要素:', btn);
+                    console.log('TimeTrackerView.bindEvents: dataset:', btn.dataset);
+                    console.log('TimeTrackerView.bindEvents: data-view属性:', btn.getAttribute('data-view'));
+                    
+                    const viewValue = btn.getAttribute('data-view') || btn.dataset.view;
+                    if (viewValue) {
+                        this.currentView = viewValue;
+                        console.log('TimeTrackerView.bindEvents: タブ切り替え:', this.currentView);
+                        this.showCurrentView();
+                    } else {
+                        console.error('TimeTrackerView.bindEvents: data-view属性が見つかりません');
+                    }
                 }
             });
 
