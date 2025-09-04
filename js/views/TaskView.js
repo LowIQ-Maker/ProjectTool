@@ -371,4 +371,68 @@ class TaskView {
     destroy() {
         this.eventManager.removeAllListeners();
     }
+
+    // タスクステータス変更
+    changeTaskStatus(taskId, newStatus) {
+        try {
+            const task = this.taskManager.getTask(taskId);
+            if (!task) {
+                this.showNotification('タスクが見つかりません', 'error');
+                return;
+            }
+
+            const oldStatus = task.status;
+            task.status = newStatus;
+            
+            const result = this.taskManager.updateTask(taskId, task);
+            if (result.success) {
+                const statusText = {
+                    'pending': '未着手',
+                    'in-progress': '進行中',
+                    'completed': '完了',
+                    'on-hold': '保留'
+                };
+                
+                this.showNotification(`タスクのステータスを「${statusText[newStatus]}」に変更しました`, 'success');
+                
+                // イベントを発火
+                this.eventManager.emit('taskUpdated', { taskId, oldStatus, newStatus });
+                
+                // テーブルを再描画
+                this.render();
+            } else {
+                this.showNotification('ステータスの変更に失敗しました', 'error');
+            }
+        } catch (error) {
+            console.error('TaskView.changeTaskStatus:', error);
+            this.showNotification('ステータスの変更中にエラーが発生しました', 'error');
+        }
+    }
+
+    // タスクタイマー開始
+    startTaskTimer(taskId) {
+        try {
+            const task = this.taskManager.getTask(taskId);
+            if (!task) {
+                this.showNotification('タスクが見つかりません', 'error');
+                return;
+            }
+
+            // タイムトラッキングページに切り替え
+            if (typeof switchPage === 'function') {
+                switchPage('time-tracking');
+            }
+
+            // タイマー開始
+            if (window.timeTracker && typeof window.timeTracker.startTimer === 'function') {
+                window.timeTracker.startTimer(taskId, task.name);
+                this.showNotification(`「${task.name}」のタイマーを開始しました`, 'success');
+            } else {
+                this.showNotification('タイムトラッキング機能が利用できません', 'error');
+            }
+        } catch (error) {
+            console.error('TaskView.startTaskTimer:', error);
+            this.showNotification('タイマーの開始中にエラーが発生しました', 'error');
+        }
+    }
 }

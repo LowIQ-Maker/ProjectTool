@@ -2021,3 +2021,25 @@ function initNotifications() {
 }
 
 // テスト用のコメント - 自動コミットテスト
+
+/**
+ * タスクステータス変更（グローバル関数）
+ */
+function changeTaskStatus(taskId, newStatus) {
+    if (window.taskView && typeof window.taskView.changeTaskStatus === 'function') {
+        window.taskView.changeTaskStatus(taskId, newStatus);
+    } else {
+        console.error('TaskViewが初期化されていません');
+    }
+}
+
+/**
+ * タスクタイマー開始（グローバル関数）
+ */
+function startTaskTimer(taskId) {
+    if (window.taskView && typeof window.taskView.startTaskTimer === 'function') {
+        window.taskView.startTaskTimer(taskId);
+    } else {
+        console.error('TaskViewが初期化されていません');
+    }
+}
