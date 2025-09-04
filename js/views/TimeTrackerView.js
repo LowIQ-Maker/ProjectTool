@@ -15,7 +15,6 @@ class TimeTrackerView {
             console.log('TimeTrackerView.init: アクティブタイマー数:', this.timeTracker.getActiveTimers().length);
             console.log('TimeTrackerView.init: 時間エントリ数:', this.timeTracker.timeEntries.length);
             this.render();
-            this.bindEvents();
             this.startUpdateTimer();
             console.log('TimeTrackerView.init: 完了');
         } catch (error) {
@@ -78,6 +77,11 @@ class TimeTrackerView {
             // 生成されたHTMLの確認
             const allPanes = document.querySelectorAll('.view-pane');
             console.log('TimeTrackerView.render: 生成されたビューペイン:', Array.from(allPanes).map(pane => pane.id));
+            
+            // DOM要素の生成完了を待ってからイベントをバインド
+            setTimeout(() => {
+                this.bindEvents();
+            }, 0);
             
             console.log('TimeTrackerView.render: 完了');
         } catch (error) {
@@ -424,6 +428,12 @@ class TimeTrackerView {
             console.log('TimeTrackerView.bindEvents: 開始');
             
             // タブ切り替え
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            console.log('TimeTrackerView.bindEvents: タブボタン数:', tabButtons.length);
+            tabButtons.forEach(btn => {
+                console.log('TimeTrackerView.bindEvents: タブボタン:', btn, 'data-view:', btn.getAttribute('data-view'));
+            });
+            
             document.addEventListener('click', (e) => {
                 if (e.target.closest('.tab-btn')) {
                     const btn = e.target.closest('.tab-btn');
@@ -443,7 +453,7 @@ class TimeTrackerView {
                         if (buttonText.includes('アクティブ')) {
                             this.currentView = 'active';
                         } else if (buttonText.includes('履歴')) {
-                            this.currentView = 'summary';
+                            this.currentView = 'history';
                         } else if (buttonText.includes('サマリー')) {
                             this.currentView = 'summary';
                         } else {
