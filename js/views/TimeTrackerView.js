@@ -535,32 +535,49 @@ class TimeTrackerView {
     }
 
     editEntry(entryId) {
-        const entry = this.timeTracker.timeEntries.find(e => e.id === entryId);
-        if (!entry) return;
+        try {
+            console.log('TimeTrackerView.editEntry: 開始:', entryId);
+            const entry = this.timeTracker.timeEntries.find(e => e.id === entryId);
+            if (!entry) {
+                console.error('TimeTrackerView.editEntry: エントリが見つかりません:', entryId);
+                return;
+            }
 
-        const newStartTime = prompt('開始時刻を入力してください (YYYY-MM-DD HH:MM)', 
-            new Date(entry.startTime).toISOString().slice(0, 16));
-        if (!newStartTime) return;
+            const newStartTime = prompt('開始時刻を入力してください (YYYY-MM-DD HH:MM)', 
+                new Date(entry.startTime).toISOString().slice(0, 16));
+            if (!newStartTime) return;
 
-        const newEndTime = prompt('終了時刻を入力してください (YYYY-MM-DD HH:MM)', 
-            new Date(entry.endTime).toISOString().slice(0, 16));
-        if (!newEndTime) return;
+            const newEndTime = prompt('終了時刻を入力してください (YYYY-MM-DD HH:MM)', 
+                new Date(entry.endTime).toISOString().slice(0, 16));
+            if (!newEndTime) return;
 
-        const result = this.timeTracker.editTimeEntry(entryId, {
-            startTime: newStartTime,
-            endTime: newEndTime
-        });
+            const result = this.timeTracker.editTimeEntry(entryId, {
+                startTime: newStartTime,
+                endTime: newEndTime
+            });
 
-        this.showNotification(result.message, result.success ? 'success' : 'error');
-        this.render();
+            console.log('TimeTrackerView.editEntry: 結果:', result);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            this.render();
+        } catch (error) {
+            console.error('TimeTrackerView.editEntry: エラーが発生しました:', error);
+            this.showNotification('時間の更新に失敗しました', 'error');
+        }
     }
 
     deleteEntry(entryId) {
-        if (!confirm('この時間エントリを削除しますか？')) return;
+        try {
+            console.log('TimeTrackerView.deleteEntry: 開始:', entryId);
+            if (!confirm('この時間エントリを削除しますか？')) return;
 
-        const result = this.timeTracker.deleteTimeEntry(entryId);
-        this.showNotification(result.message, result.success ? 'success' : 'error');
-        this.render();
+            const result = this.timeTracker.deleteTimeEntry(entryId);
+            console.log('TimeTrackerView.deleteEntry: 結果:', result);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            this.render();
+        } catch (error) {
+            console.error('TimeTrackerView.deleteEntry: エラーが発生しました:', error);
+            this.showNotification('時間記録の削除に失敗しました', 'error');
+        }
     }
 
     exportData() {
