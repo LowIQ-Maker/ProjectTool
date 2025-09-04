@@ -72,7 +72,7 @@ class TimeTrackerView {
         
         if (activeTimers.length === 0) {
             return `
-                <div id="active-timers-view" class="view-pane ${this.currentView === 'active' ? 'active' : ''}">
+                <div id="active-timers-view" class="view-pane">
                     <div class="no-active-timers">
                         <i class="fas fa-clock"></i>
                         <p>現在アクティブなタイマーはありません</p>
@@ -83,7 +83,7 @@ class TimeTrackerView {
         }
 
         return `
-            <div id="active-timers-view" class="view-pane ${this.currentView === 'active' ? 'active' : ''}">
+            <div id="active-timers-view" class="view-pane">
                 <div class="active-timers-list">
                     ${activeTimers.map(timer => `
                         <div class="timer-card" data-task-id="${timer.taskId}">
@@ -123,7 +123,7 @@ class TimeTrackerView {
             .slice(0, 50);
 
         return `
-            <div id="history-view" class="view-pane ${this.currentView === 'history' ? 'active' : ''}">
+            <div id="history-view" class="view-pane">
                 <div class="history-filters">
                     <input type="date" id="history-date-filter" class="form-control">
                     <select id="history-task-filter" class="form-control">
@@ -180,7 +180,7 @@ class TimeTrackerView {
         const totalWeek = Object.values(weeklySummary).reduce((sum, day) => sum + day.totalTime, 0);
 
         return `
-            <div id="summary-view" class="view-pane ${this.currentView === 'summary' ? 'active' : ''}">
+            <div id="summary-view" class="view-pane">
                 <div class="summary-overview">
                     <div class="summary-card">
                         <h3>今日の合計</h3>
