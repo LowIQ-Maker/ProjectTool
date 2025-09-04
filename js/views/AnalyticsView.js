@@ -702,9 +702,11 @@ class AnalyticsView {
             // キャンバスのサイズを明示的に設定
             const container = ctx.parentElement;
             if (container) {
+                // コンテナのサイズを設定
                 container.style.height = '400px';
                 container.style.width = '100%';
                 container.style.position = 'relative';
+                container.style.overflow = 'hidden';
                 
                 // キャンバスのサイズを強制的に設定
                 ctx.width = 800;
@@ -714,9 +716,15 @@ class AnalyticsView {
                 ctx.style.display = 'block';
                 ctx.style.maxWidth = '100%';
                 ctx.style.maxHeight = '400px';
+                ctx.style.boxSizing = 'border-box';
+                
+                // キャンバスの属性も設定
+                ctx.setAttribute('width', '800');
+                ctx.setAttribute('height', '400');
                 
                 console.log('AnalyticsView.renderBudgetChart: キャンバスサイズを設定しました');
                 console.log('AnalyticsView.renderBudgetChart: キャンバスサイズ:', ctx.width, 'x', ctx.height);
+                console.log('AnalyticsView.renderBudgetChart: コンテナサイズ:', container.offsetWidth, 'x', container.offsetHeight);
             }
 
             // 既存のチャートインスタンスを確実に破棄
@@ -819,8 +827,10 @@ class AnalyticsView {
                     // キャンバスの表示を確認
                     console.log('AnalyticsView.renderBudgetChart: 最終キャンバスサイズ:', ctx.width, 'x', ctx.height);
                     console.log('AnalyticsView.renderBudgetChart: キャンバススタイル:', ctx.style.cssText);
+                    console.log('AnalyticsView.renderBudgetChart: キャンバス表示状態:', ctx.style.display);
+                    console.log('AnalyticsView.renderBudgetChart: キャンバス可視性:', ctx.offsetWidth, 'x', ctx.offsetHeight);
                 }
-            }, 200);
+            }, 300);
             
             console.log('AnalyticsView.renderBudgetChart: チャート作成完了');
             console.log('AnalyticsView.renderBudgetChart: 完了');

@@ -347,9 +347,11 @@ class DashboardView {
             return;
         }
 
-        // ChartHelperのインスタンスを保持
-        if (!this.chartHelper) {
-            this.chartHelper = new ChartHelper();
+        // Chart.jsが利用可能かチェック
+        if (typeof Chart === 'undefined') {
+            console.error('DashboardView.renderTaskStatusChart: Chart.jsが読み込まれていません');
+            canvas.parentElement.innerHTML = '<p class="error">Chart.jsの読み込みに失敗しました</p>';
+            return;
         }
         
         const labels = ['完了', '進行中', '保留', '未着手'];
@@ -361,32 +363,34 @@ class DashboardView {
         ];
         const colors = ['#28a745', '#007bff', '#ffc107', '#6c757d'];
 
-        const chart = this.chartHelper.createDoughnutChart(canvas, {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: colors,
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        }, {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
+        this.charts.taskStatus = new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'タスク状況'
+                    }
                 }
             }
         });
 
-        if (!chart) {
-            canvas.parentElement.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>グラフの表示に失敗しました</h3>
-                    <p>Chart.jsの読み込みを確認してください</p>
-                </div>
-            `;
-        }
+        console.log('DashboardView.renderTaskStatusChart: チャート作成完了');
     }
 
     renderBudgetChart() {
@@ -394,8 +398,28 @@ class DashboardView {
         if (!canvas) return;
 
         // 既存のチャートを破棄
-        if (this.chartHelper) {
-            this.chartHelper.destroyChart(canvas);
+        if (this.charts.budget) {
+            try {
+                this.charts.budget.destroy();
+                console.log('DashboardView.renderBudgetChart: 既存のbudgetチャートを破棄');
+            } catch (error) {
+                console.warn('DashboardView.renderBudgetChart: チャート破棄エラー:', error);
+            }
+            this.charts.budget = null;
+        }
+
+        // Chart.jsのインスタンスIDをリセット
+        if (typeof Chart !== 'undefined' && Chart.instances) {
+            Object.keys(Chart.instances).forEach(id => {
+                if (Chart.instances[id] && Chart.instances[id].canvas && Chart.instances[id].canvas.id === 'budgetChart') {
+                    try {
+                        Chart.instances[id].destroy();
+                        console.log('DashboardView.renderBudgetChart: Chart.instancesからbudgetチャートを破棄:', id);
+                    } catch (error) {
+                        console.warn('DashboardView.renderBudgetChart: Chart.instances破棄エラー:', error);
+                    }
+                }
+            });
         }
 
         const projects = this.projectManager.getProjects();
@@ -413,9 +437,11 @@ class DashboardView {
         const storage = new Storage();
         const expenses = storage.getExpenses();
         
-        // ChartHelperのインスタンスを保持
-        if (!this.chartHelper) {
-            this.chartHelper = new ChartHelper();
+        // Chart.jsが利用可能かチェック
+        if (typeof Chart === 'undefined') {
+            console.error('DashboardView.renderBudgetChart: Chart.jsが読み込まれていません');
+            canvas.parentElement.innerHTML = '<p class="error">Chart.jsの読み込みに失敗しました</p>';
+            return;
         }
         
         const labels = projects.map(p => p.name);
@@ -425,39 +451,48 @@ class DashboardView {
             return projectExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
         });
 
-        const chart = this.chartHelper.createBarChart(canvas, {
-            labels: labels,
-            datasets: [{
-                label: '予算',
-                data: budgetData,
-                backgroundColor: 'rgba(40, 162, 235, 0.6)',
-                borderColor: 'rgba(40, 162, 235, 1)',
-                borderWidth: 1
-            }, {
-                label: '支出',
-                data: expenseData,
-                backgroundColor: 'rgba(220, 53, 69, 0.6)',
-                borderColor: 'rgba(220, 53, 69, 1)',
-                borderWidth: 1
-            }]
-        }, {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+        this.charts.budget = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '予算',
+                    data: budgetData,
+                    backgroundColor: 'rgba(40, 162, 235, 0.6)',
+                    borderColor: 'rgba(40, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: '支出',
+                    data: expenseData,
+                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '¥' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '予算 vs 支出'
+                    }
                 }
             }
         });
 
-        if (!chart) {
-            canvas.parentElement.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>グラフの表示に失敗しました</h3>
-                    <p>Chart.jsの読み込みを確認してください</p>
-                </div>
-            `;
-        }
+        console.log('DashboardView.renderBudgetChart: チャート作成完了');
     }
 
     destroy() {
