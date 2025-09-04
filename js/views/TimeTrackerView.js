@@ -135,58 +135,71 @@ class TimeTrackerView {
     }
 
     renderHistory() {
-        const timeEntries = this.timeTracker.timeEntries;
-        const recentEntries = timeEntries
-            .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))
-            .slice(0, 50);
+        try {
+            const timeEntries = this.timeTracker.timeEntries || [];
+            const recentEntries = timeEntries
+                .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))
+                .slice(0, 50);
 
-        return `
-            <div id="history-view" class="view-pane">
-                <div class="history-filters">
-                    <input type="date" id="history-date-filter" class="form-control">
-                    <select id="history-task-filter" class="form-control">
-                        <option value="">すべてのタスク</option>
-                        ${this.getUniqueTaskOptions()}
-                    </select>
-                </div>
-                
-                <div class="time-entries-list">
-                    ${recentEntries.length === 0 ? `
-                        <div class="no-entries">
-                            <i class="fas fa-history"></i>
-                            <p>時間記録がありません</p>
-                        </div>
-                    ` : recentEntries.map(entry => `
-                        <div class="time-entry-card" data-entry-id="${entry.id}">
-                            <div class="entry-header">
-                                <h4>${entry.taskName}</h4>
-                                <div class="entry-actions">
-                                    <button class="btn btn-sm btn-outline edit-entry" data-entry-id="${entry.id}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger delete-entry" data-entry-id="${entry.id}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+            console.log('TimeTrackerView.renderHistory: 履歴エントリ数:', recentEntries.length);
+
+            return `
+                <div id="history-view" class="view-pane">
+                    <div class="history-filters">
+                        <input type="date" id="history-date-filter" class="form-control">
+                        <select id="history-task-filter" class="form-control">
+                            <option value="">すべてのタスク</option>
+                            ${this.getUniqueTaskOptions()}
+                        </select>
+                    </div>
+                    
+                    <div class="time-entries-list">
+                        ${recentEntries.length === 0 ? `
+                            <div class="no-entries">
+                                <i class="fas fa-history"></i>
+                                <p>時間記録がありません</p>
+                            </div>
+                        ` : recentEntries.map(entry => `
+                            <div class="time-entry-card" data-entry-id="${entry.id}">
+                                <div class="entry-header">
+                                    <h4>${entry.taskName || '不明なタスク'}</h4>
+                                    <div class="entry-actions">
+                                        <button class="btn btn-sm btn-outline edit-entry" data-entry-id="${entry.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-entry" data-entry-id="${entry.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="entry-details">
+                                    <div class="entry-time">
+                                        <span class="label">時間:</span>
+                                        <span class="value">${this.timeTracker.formatTime(entry.duration || 0)}</span>
+                                    </div>
+                                    <div class="entry-period">
+                                        <span class="label">期間:</span>
+                                        <span class="value">
+                                            ${entry.startTime ? new Date(entry.startTime).toLocaleString() : '不明'} - 
+                                            ${entry.endTime ? new Date(entry.endTime).toLocaleString() : '不明'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="entry-details">
-                                <div class="entry-time">
-                                    <span class="label">時間:</span>
-                                    <span class="value">${this.timeTracker.formatTime(entry.duration)}</span>
-                                </div>
-                                <div class="entry-period">
-                                    <span class="label">期間:</span>
-                                    <span class="value">
-                                        ${new Date(entry.startTime).toLocaleString()} - 
-                                        ${new Date(entry.endTime).toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        } catch (error) {
+            console.error('TimeTrackerView.renderHistory: エラーが発生しました:', error);
+            return `
+                <div id="history-view" class="view-pane">
+                    <div class="error">
+                        <p>履歴の表示に失敗しました</p>
+                    </div>
+                </div>
+            `;
+        }
     }
 
     renderSummary() {
