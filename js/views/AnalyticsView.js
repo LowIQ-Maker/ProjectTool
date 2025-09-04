@@ -520,13 +520,19 @@ class AnalyticsView {
                 this.charts.productivity.destroy();
             }
 
+            // データが空の場合の処理
+            if (!data || data.length === 0) {
+                ctx.innerHTML = '<p class="no-data">プロジェクトデータがありません</p>';
+                return;
+            }
+
             this.charts.productivity = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(d => d.projectName),
+                    labels: data.map(d => d.projectName || '不明なプロジェクト'),
                     datasets: [{
                         label: '完了率 (%)',
-                        data: data.map(d => Math.round(d.completionRate * 100)),
+                        data: data.map(d => Math.round((d.completionRate || 0) * 100)),
                         backgroundColor: 'rgba(54, 162, 235, 0.8)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1
@@ -534,16 +540,26 @@ class AnalyticsView {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
                         }
                     },
                     plugins: {
                         title: {
                             display: true,
                             text: 'プロジェクト別完了率'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
@@ -582,29 +598,46 @@ class AnalyticsView {
                 this.charts.budget.destroy();
             }
 
+            // データが空の場合の処理
+            if (!data || data.length === 0) {
+                ctx.innerHTML = '<p class="no-data">支出データがありません</p>';
+                return;
+            }
+
             this.charts.budget = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.map(d => d.month),
+                    labels: data.map(d => d.month || '不明な月'),
                     datasets: [{
                         label: '月別支出 (円)',
-                        data: data.map(d => d.totalExpense),
+                        data: data.map(d => d.totalExpense || 0),
                         borderColor: 'rgba(255, 99, 132, 1)',
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        tension: 0.1
+                        tension: 0.1,
+                        fill: true
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                }
+                            }
                         }
                     },
                     plugins: {
                         title: {
                             display: true,
                             text: '月別支出傾向'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
