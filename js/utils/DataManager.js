@@ -376,8 +376,8 @@ class DataManager {
             
             this.showNotification('データのインポートが完了しました', 'success');
             
-            // ページをリロードして新しいデータを反映
-            setTimeout(() => location.reload(), 1000);
+            // データ更新後にUIを更新
+            this.updateUIAfterImport();
 
         } catch (error) {
             alert(`インポートエラー: ${error.message}`);
@@ -452,8 +452,8 @@ class DataManager {
             this.storage.clearAll();
             this.showNotification('全てのデータを削除しました', 'info');
             
-            // ページをリロード
-            setTimeout(() => location.reload(), 1000);
+            // データ削除後にUIを更新
+            this.updateUIAfterClear();
         } catch (error) {
             alert(`データ削除エラー: ${error.message}`);
         }
