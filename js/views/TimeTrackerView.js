@@ -688,9 +688,8 @@ class TimeTrackerView {
             activeTimers.forEach(timer => {
                 const elapsedElement = document.querySelector(`[data-task-id="${timer.taskId}"] .elapsed-time`);
                 if (elapsedElement) {
-                    elapsedElement.textContent = this.timeTracker.formatTime(
-                        this.timeTracker.getElapsedTime(timer.taskId)
-                    );
+                    const elapsedTime = this.timeTracker.getElapsedTime(timer.taskId);
+                    elapsedElement.textContent = this.timeTracker.formatTime(elapsedTime);
                 }
             });
         } catch (error) {
@@ -699,12 +698,18 @@ class TimeTrackerView {
     }
 
     showNotification(message, type = 'info') {
-        // 通知表示の実装
-        console.log(`${type}: ${message}`);
+        try {
+            console.log(`TimeTrackerView.showNotification: ${type}: ${message}`);
+            // 通知表示の実装
+            // ここで実際の通知UIを実装する
+        } catch (error) {
+            console.error('TimeTrackerView.showNotification: エラーが発生しました:', error);
+        }
     }
 
     destroy() {
         try {
+            console.log('TimeTrackerView.destroy: 開始');
             if (this.updateInterval) {
                 clearInterval(this.updateInterval);
                 this.updateInterval = null;
@@ -715,7 +720,7 @@ class TimeTrackerView {
                 this.weeklyChart = null;
             }
             
-            console.log('TimeTrackerView: 破棄完了');
+            console.log('TimeTrackerView.destroy: 破棄完了');
         } catch (error) {
             console.error('TimeTrackerView.destroy: エラーが発生しました:', error);
         }
