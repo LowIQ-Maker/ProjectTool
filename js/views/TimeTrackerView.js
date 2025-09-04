@@ -581,52 +581,91 @@ class TimeTrackerView {
     }
 
     exportData() {
-        const format = confirm('CSV形式でエクスポートしますか？\nOK: CSV, キャンセル: JSON') ? 'csv' : 'json';
-        const data = this.timeTracker.exportTimeEntries(format);
-        const filename = `time-entries-${new Date().toISOString().slice(0, 10)}.${format}`;
+        try {
+            console.log('TimeTrackerView.exportData: 開始');
+            const format = confirm('CSV形式でエクスポートしますか？\nOK: CSV, キャンセル: JSON') ? 'csv' : 'json';
+            const data = this.timeTracker.exportTimeEntries(format);
+            const filename = `time-entries-${new Date().toISOString().slice(0, 10)}.${format}`;
 
-        const blob = new Blob([data], { type: format === 'csv' ? 'text/csv' : 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
+            const blob = new Blob([data], { type: format === 'csv' ? 'text/csv' : 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
 
-        this.showNotification('データをエクスポートしました', 'success');
+            this.showNotification('データをエクスポートしました', 'success');
+            console.log('TimeTrackerView.exportData: 完了');
+        } catch (error) {
+            console.error('TimeTrackerView.exportData: エラーが発生しました:', error);
+            this.showNotification('データのエクスポートに失敗しました', 'error');
+        }
     }
 
     importData() {
-        document.getElementById('time-data-file-input').click();
+        try {
+            console.log('TimeTrackerView.importData: 開始');
+            const fileInput = document.getElementById('time-data-file-input');
+            if (fileInput) {
+                fileInput.click();
+            } else {
+                console.error('TimeTrackerView.importData: ファイル入力要素が見つかりません');
+            }
+        } catch (error) {
+            console.error('TimeTrackerView.importData: エラーが発生しました:', error);
+            this.showNotification('ファイル選択に失敗しました', 'error');
+        }
     }
 
     handleFileSelection(file) {
-        if (!file) return;
+        try {
+            console.log('TimeTrackerView.handleFileSelection: 開始');
+            if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const result = this.timeTracker.importTimeEntries(e.target.result);
-                this.showNotification(result.message, result.success ? 'success' : 'error');
-                this.render();
-            } catch (error) {
-                this.showNotification('ファイルの読み込みに失敗しました', 'error');
-            }
-        };
-        reader.readAsText(file);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const result = this.timeTracker.importTimeEntries(e.target.result);
+                    console.log('TimeTrackerView.handleFileSelection: 結果:', result);
+                    this.showNotification(result.message, result.success ? 'success' : 'error');
+                    this.render();
+                } catch (error) {
+                    console.error('TimeTrackerView.handleFileSelection: ファイル読み込みエラー:', error);
+                    this.showNotification('ファイルの読み込みに失敗しました', 'error');
+                }
+            };
+            reader.readAsText(file);
+        } catch (error) {
+            console.error('TimeTrackerView.handleFileSelection: エラーが発生しました:', error);
+            this.showNotification('ファイルの処理に失敗しました', 'error');
+        }
     }
 
     clearData() {
-        if (!confirm('すべての時間データを削除しますか？\nこの操作は取り消せません。')) return;
+        try {
+            console.log('TimeTrackerView.clearData: 開始');
+            if (!confirm('すべての時間データを削除しますか？\nこの操作は取り消せません。')) return;
 
-        const result = this.timeTracker.clearAllData();
-        this.showNotification(result.message, result.success ? 'success' : 'error');
-        this.render();
+            const result = this.timeTracker.clearAllData();
+            console.log('TimeTrackerView.clearData: 結果:', result);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            this.render();
+        } catch (error) {
+            console.error('TimeTrackerView.clearData: エラーが発生しました:', error);
+            this.showNotification('データの削除に失敗しました', 'error');
+        }
     }
 
     filterHistory() {
-        // フィルタリング機能の実装
-        this.render();
+        try {
+            console.log('TimeTrackerView.filterHistory: 開始');
+            // フィルタリング機能の実装
+            this.render();
+            console.log('TimeTrackerView.filterHistory: 完了');
+        } catch (error) {
+            console.error('TimeTrackerView.filterHistory: エラーが発生しました:', error);
+        }
     }
 
     startUpdateTimer() {
