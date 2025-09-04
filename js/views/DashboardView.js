@@ -1,0 +1,394 @@
+/**
+ * ダッシュボードビュークラス
+ */
+class DashboardView {
+    constructor() {
+        this.projectManager = new ProjectManager();
+        this.taskManager = new TaskManager();
+        this.progressManager = new ProgressManager();
+        this.eventManager = new EventManager();
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.render();
+    }
+
+    bindEvents() {
+        this.eventManager.on('projectCreated', () => this.render());
+        this.eventManager.on('projectUpdated', () => this.render());
+        this.eventManager.on('projectDeleted', () => this.render());
+        this.eventManager.on('taskCreated', () => this.render());
+        this.eventManager.on('taskUpdated', () => this.render());
+        this.eventManager.on('taskDeleted', () => this.render());
+        this.eventManager.on('taskCompleted', () => this.render());
+    }
+
+    render() {
+        this.renderStats();
+        this.renderProjectList();
+        this.renderTaskList();
+        this.renderCharts();
+    }
+
+    renderStats() {
+        const projectStats = this.projectManager.getProjectStats();
+        const taskStats = this.taskManager.getTaskStats();
+        const overallProgress = this.progressManager.calculateOverallProgress();
+
+        // 進行中プロジェクト数
+        const inProgressProjects = projectStats.byStatus['in-progress'] || 0;
+        this.updateStatCard('project-count', inProgressProjects);
+
+        // 未完了タスク数（総数 - 完了）
+        const incompleteTasks = (taskStats.total || 0) - (taskStats.byStatus.completed || 0);
+        this.updateStatCard('task-count', incompleteTasks);
+
+        // 全体進捗率
+        this.updateStatCard('progress-percentage', `${overallProgress}%`);
+
+        // 予算使用率（支出合計 / 予算合計）
+        const storage = new Storage();
+        const expenses = storage.getExpenses();
+        const projects = this.projectManager.getProjects();
+        const totalBudget = projects.reduce((sum, p) => sum + (Number(p.budget) || 0), 0);
+        const totalExpense = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+        const budgetUsage = totalBudget > 0 ? Math.min(100, Math.round((totalExpense / totalBudget) * 100)) : 0;
+        this.updateStatCard('budget-usage', `${budgetUsage}%`);
+
+        // 期限切れ数（必要なら別カードで使用）
+        this.updateStatCard('overdue-count', taskStats.overdue || 0);
+    }
+
+    updateStatCard(cardId, value) {
+        const card = document.querySelector(`#${cardId} .stat-number`);
+        if (card) {
+            card.textContent = value;
+        }
+    }
+
+    renderProjectList() {
+        const projects = this.projectManager.getProjects();
+        const container = document.querySelector('.project-list');
+        
+        if (!container) return;
+
+        if (projects.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>プロジェクトがありません</h3>
+                    <p>新規プロジェクトを作成してください</p>
+                </div>
+            `;
+            return;
+        }
+
+        const recentProjects = projects
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 3);
+
+        container.innerHTML = recentProjects.map(project => {
+            const progress = this.progressManager.calculateProjectProgress(project.id);
+            const tasks = this.taskManager.getTasksByProject(project.id);
+            const completedTasks = tasks.filter(t => t.status === 'completed').length;
+            
+            return `
+                <div class="project-item" data-project-id="${project.id}">
+                    <div class="project-info">
+                        <h4>${project.name}</h4>
+                        <p>${project.description || '説明なし'}</p>
+                        <div class="project-meta">
+                            <span class="task-count">${completedTasks}/${tasks.length} タスク完了</span>
+                            <span class="due-date">期限: ${project.endDate}</span>
+                        </div>
+                    </div>
+                    <div class="project-status">
+                        <span class="status-badge status-${project.getStatusColor()}">
+                            ${project.getStatusText()}
+                        </span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <span class="progress-text">${progress}%</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderTaskList() {
+        const dueSoonTasks = this.taskManager.getDueSoonTasks(7);
+        const overdueTasks = this.taskManager.getOverdueTasks();
+        const highPriorityTasks = this.taskManager.getHighPriorityTasks();
+        
+        const displayTasks = new Set();
+        [...overdueTasks, ...dueSoonTasks, ...highPriorityTasks].forEach(task => {
+            if (task.status !== 'completed') {
+                displayTasks.add(task);
+            }
+        });
+
+        const taskArray = Array.from(displayTasks).slice(0, 5);
+        const container = document.querySelector('.task-list');
+        
+        if (!container) return;
+
+        if (taskArray.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>すべてのタスクが完了しています</h3>
+                    <p>素晴らしい仕事です！</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = taskArray.map(task => {
+            const project = this.projectManager.getProject(task.projectId);
+            const isOverdue = task.isOverdue();
+            const isDueSoon = task.isDueSoon();
+            
+            return `
+                <div class="task-item priority-${task.priority} ${isOverdue ? 'overdue' : ''}" data-task-id="${task.id}">
+                    <div class="task-checkbox">
+                        <input type="checkbox" id="task_${task.id}" ${task.status === 'completed' ? 'checked' : ''}>
+                        <label for="task_${task.id}"></label>
+                    </div>
+                    <div class="task-content">
+                        <h4>${task.name}</h4>
+                        <p>${task.description || '説明なし'}</p>
+                        <div class="task-meta">
+                            <span class="project-name">${project ? project.name : '不明なプロジェクト'}</span>
+                            <span class="due-date ${isOverdue ? 'overdue' : (isDueSoon ? 'due-soon' : '')}">
+                                ${task.getDueDateText()}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <span class="priority-badge priority-${task.priority}">
+                            ${task.getPriorityText()}
+                        </span>
+                        <button class="btn btn-sm btn-secondary" onclick="editTask('${task.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    renderCharts() {
+        this.renderProgressChart();
+        this.renderTaskStatusChart();
+        this.renderBudgetChart();
+    }
+
+    renderProgressChart() {
+        const canvas = document.getElementById('progressChart');
+        if (!canvas) return;
+
+        // 既存のチャートを破棄
+        if (this.chartHelper) {
+            this.chartHelper.destroyChart(canvas);
+        }
+
+        const projects = this.projectManager.getProjects();
+        if (projects.length === 0) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>プロジェクトがありません</h3>
+                    <p>新規プロジェクトを作成してグラフを表示してください</p>
+                </div>
+            `;
+            return;
+        }
+
+        // ChartHelperのインスタンスを保持
+        if (!this.chartHelper) {
+            this.chartHelper = new ChartHelper();
+        }
+        
+        const labels = projects.map(p => p.name);
+        const data = projects.map(p => {
+            const tasks = this.taskManager.getTasksByProject(p.id);
+            return this.progressManager.calculateProjectProgress(p.id);
+        });
+
+        const chart = this.chartHelper.createBarChart(canvas, {
+            labels: labels,
+            datasets: [{
+                label: '進捗率 (%)',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        }, {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        });
+
+        if (!chart) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>グラフの表示に失敗しました</h3>
+                    <p>Chart.jsの読み込みを確認してください</p>
+                </div>
+            `;
+        }
+    }
+
+    renderTaskStatusChart() {
+        const canvas = document.getElementById('taskStatusChart');
+        if (!canvas) return;
+
+        // 既存のチャートを破棄
+        if (this.chartHelper) {
+            this.chartHelper.destroyChart(canvas);
+        }
+
+        const taskStats = this.taskManager.getTaskStats();
+        if (taskStats.total === 0) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>タスクがありません</h3>
+                    <p>新規タスクを作成してグラフを表示してください</p>
+                </div>
+            `;
+            return;
+        }
+
+        // ChartHelperのインスタンスを保持
+        if (!this.chartHelper) {
+            this.chartHelper = new ChartHelper();
+        }
+        
+        const labels = ['完了', '進行中', '保留', '未着手'];
+        const data = [
+            taskStats.byStatus.completed || 0,
+            taskStats.byStatus['in-progress'] || 0,
+            taskStats.byStatus['on-hold'] || 0,
+            taskStats.byStatus.pending || 0
+        ];
+        const colors = ['#28a745', '#007bff', '#ffc107', '#6c757d'];
+
+        const chart = this.chartHelper.createDoughnutChart(canvas, {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        }, {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        });
+
+        if (!chart) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>グラフの表示に失敗しました</h3>
+                    <p>Chart.jsの読み込みを確認してください</p>
+                </div>
+            `;
+        }
+    }
+
+    renderBudgetChart() {
+        const canvas = document.getElementById('budgetChart');
+        if (!canvas) return;
+
+        // 既存のチャートを破棄
+        if (this.chartHelper) {
+            this.chartHelper.destroyChart(canvas);
+        }
+
+        const projects = this.projectManager.getProjects();
+        if (projects.length === 0) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>プロジェクトがありません</h3>
+                    <p>新規プロジェクトを作成してグラフを表示してください</p>
+                </div>
+            `;
+            return;
+        }
+
+        const storage = new Storage();
+        const expenses = storage.getExpenses();
+        
+        // ChartHelperのインスタンスを保持
+        if (!this.chartHelper) {
+            this.chartHelper = new ChartHelper();
+        }
+        
+        const labels = projects.map(p => p.name);
+        const budgetData = projects.map(p => Number(p.budget) || 0);
+        const expenseData = projects.map(p => {
+            const projectExpenses = expenses.filter(e => e.projectId === p.id);
+            return projectExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+        });
+
+        const chart = this.chartHelper.createBarChart(canvas, {
+            labels: labels,
+            datasets: [{
+                label: '予算',
+                data: budgetData,
+                backgroundColor: 'rgba(40, 162, 235, 0.6)',
+                borderColor: 'rgba(40, 162, 235, 1)',
+                borderWidth: 1
+            }, {
+                label: '支出',
+                data: expenseData,
+                backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                borderColor: 'rgba(220, 53, 69, 1)',
+                borderWidth: 1
+            }]
+        }, {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        });
+
+        if (!chart) {
+            canvas.parentElement.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>グラフの表示に失敗しました</h3>
+                    <p>Chart.jsの読み込みを確認してください</p>
+                </div>
+            `;
+        }
+    }
+
+    destroy() {
+        this.eventManager.removeAllListeners();
+        
+        // チャートを破棄
+        if (this.chartHelper) {
+            this.chartHelper.destroyAllCharts();
+            this.chartHelper = null;
+        }
+    }
+}

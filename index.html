@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロジェクト管理ツール</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <!-- サイドバーナビゲーション -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">
+                <i class="fas fa-tasks"></i>
+                <span>ProjectTool</span>
+            </h1>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item active">
+                <a href="#dashboard" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>ダッシュボード</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#projects" class="nav-link">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>プロジェクト</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#tasks" class="nav-link">
+                    <i class="fas fa-list-check"></i>
+                    <span>タスク</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#gantt" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>ガントチャート</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#expenses" class="nav-link">
+                    <i class="fas fa-receipt"></i>
+                    <span>支出管理</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#reports" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>レポート</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#settings" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>設定</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#data-import-export" class="nav-link">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>データ管理</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        <!-- ヘッダー -->
+        <header class="header">
+            <div class="header-left">
+                <h2 class="page-title">ダッシュボード</h2>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    新規プロジェクト
+                </button>
+                <div class="user-menu">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- ダッシュボード -->
+        <section id="dashboard" class="dashboard-section active">
+            <!-- 統計カード -->
+            <div class="stats-grid">
+                <div class="stat-card" id="project-count">
+                    <div class="stat-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">0</h3>
+                        <p class="stat-label">進行中プロジェクト</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="task-count">
+                    <div class="stat-icon">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">0</h3>
+                        <p class="stat-label">未完了タスク</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="progress-percentage">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">0%</h3>
+                        <p class="stat-label">全体進捗率</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="budget-usage">
+                    <div class="stat-icon">
+                        <i class="fas fa-yen-sign"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number">0%</h3>
+                        <p class="stat-label">予算使用率</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- メインコンテンツエリア -->
+            <div class="content-grid">
+                <!-- 最近のプロジェクト -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>最近のプロジェクト</h3>
+                        <a href="#" class="view-all">すべて表示</a>
+                    </div>
+                    <div class="project-list">
+                        <div class="project-item">
+                            <div class="project-info">
+                                <h4>Webサイトリニューアル</h4>
+                                <p>企業サイトのデザイン刷新プロジェクト</p>
+                            </div>
+                            <div class="project-status">
+                                <span class="status-badge status-in-progress">進行中</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="project-item">
+                            <div class="project-info">
+                                <h4>モバイルアプリ開発</h4>
+                                <p>iOS/Android向けの新規アプリ開発</p>
+                            </div>
+                            <div class="project-status">
+                                <span class="status-badge status-planned">計画中</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 15%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="project-item">
+                            <div class="project-info">
+                                <h4>データベース移行</h4>
+                                <p>レガシーシステムからのDB移行作業</p>
+                            </div>
+                            <div class="project-status">
+                                <span class="status-badge status-completed">完了</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 期限が近いタスク -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>期限が近いタスク</h3>
+                        <a href="#" class="view-all">すべて表示</a>
+                    </div>
+                    <div class="task-list">
+                        <div class="task-item priority-high">
+                            <div class="task-checkbox">
+                                <input type="checkbox" id="task1">
+                                <label for="task1"></label>
+                            </div>
+                            <div class="task-content">
+                                <h4>デザインカンプの作成</h4>
+                                <p>Webサイトリニューアル</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="due-date">明日</span>
+                                <span class="priority-badge priority-high">高</span>
+                            </div>
+                        </div>
+                        
+                        <div class="task-item priority-medium">
+                            <div class="task-checkbox">
+                                <input type="checkbox" id="task2">
+                                <label for="task2"></label>
+                            </div>
+                            <div class="task-content">
+                                <h4>API仕様書のレビュー</h4>
+                                <p>モバイルアプリ開発</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="due-date">3日後</span>
+                                <span class="priority-badge priority-medium">中</span>
+                            </div>
+                        </div>
+                        
+                        <div class="task-item priority-low">
+                            <div class="task-checkbox">
+                                <input type="checkbox" id="task3">
+                                <label for="task3"></label>
+                            </div>
+                            <div class="task-content">
+                                <h4>テストケースの作成</h4>
+                                <p>データベース移行</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="due-date">1週間後</span>
+                                <span class="priority-badge priority-low">低</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- グラフセクション -->
+            <div class="charts-grid">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>プロジェクト進捗</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>タスク状況</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="taskStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>予算 vs 支出</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- プロジェクト一覧画面 -->
+        <section id="projects" class="page-section">
+            <div class="page-header">
+                <h2>プロジェクト一覧</h2>
+                <button class="btn btn-primary" id="addProjectBtn" onclick="openNewProjectModal()">
+                    <i class="fas fa-plus"></i>
+                    新規プロジェクト
+                </button>
+            </div>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="statusFilter">ステータス:</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">すべて</option>
+                        <option value="planned">計画中</option>
+                        <option value="in-progress">進行中</option>
+                        <option value="completed">完了</option>
+                        <option value="on-hold">保留</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sortBy">並び順:</label>
+                    <select id="sortBy" class="form-select">
+                        <option value="created">作成日順</option>
+                        <option value="deadline">期限順</option>
+                        <option value="name">名前順</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="projects-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>プロジェクト名</th>
+                            <th>説明</th>
+                            <th>開始日</th>
+                            <th>期限</th>
+                            <th>予算</th>
+                            <th>ステータス</th>
+                            <th>進捗</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectsTableBody">
+                        <!-- JavaScriptで動的に生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- タスク一覧画面 -->
+        <section id="tasks" class="page-section">
+            <div class="page-header">
+                <h2>タスク一覧</h2>
+                <button class="btn btn-primary" id="addTaskBtn" onclick="openNewTaskModal()">
+                    <i class="fas fa-plus"></i>
+                    新規タスク
+                </button>
+            </div>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="projectFilter">プロジェクト:</label>
+                    <select id="projectFilter" class="form-select">
+                        <option value="">すべて</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="priorityFilter">優先度:</label>
+                    <select id="priorityFilter" class="form-select">
+                        <option value="">すべて</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilter">ステータス:</label>
+                    <select id="taskStatusFilter" class="form-select">
+                        <option value="">すべて</option>
+                        <option value="pending">未着手</option>
+                        <option value="in-progress">進行中</option>
+                        <option value="completed">完了</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="tasks-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>タスク名</th>
+                            <th>プロジェクト</th>
+                            <th>説明</th>
+                            <th>優先度</th>
+                            <th>期限</th>
+                            <th>予想工数</th>
+                            <th>ステータス</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody">
+                        <!-- JavaScriptで動的に生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ガントチャート画面 -->
+        <section id="gantt" class="page-section">
+            <div class="page-header">
+                <h2>ガントチャート</h2>
+                <div class="gantt-controls">
+                    <button class="btn btn-secondary" id="zoomInBtn">
+                        <i class="fas fa-search-plus"></i>
+                        拡大
+                    </button>
+                    <button class="btn btn-secondary" id="zoomOutBtn">
+                        <i class="fas fa-search-minus"></i>
+                        縮小
+                    </button>
+                    <button class="btn btn-secondary" id="todayBtn">
+                        <i class="fas fa-calendar-day"></i>
+                        今日
+                    </button>
+                </div>
+            </div>
+            
+            <div class="gantt-container">
+                <div class="gantt-timeline" id="ganttTimeline">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+                <div class="gantt-chart" id="ganttChart">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 支出管理画面 -->
+        <section id="expenses" class="page-section">
+            <div class="page-header">
+                <h2>支出管理</h2>
+                <button class="btn btn-primary" id="addExpenseBtn" onclick="openNewExpenseModal()">
+                    <i class="fas fa-plus"></i>
+                    新規支出記録
+                </button>
+            </div>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="expenseProjectFilter">プロジェクト:</label>
+                    <select id="expenseProjectFilter" class="form-select">
+                        <option value="">すべて</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="expenseDateFilter">期間:</label>
+                    <select id="expenseDateFilter" class="form-select">
+                        <option value="">すべて</option>
+                        <option value="today">今日</option>
+                        <option value="week">1週間</option>
+                        <option value="month">1ヶ月</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="expense-stats">
+                <!-- JavaScriptで動的に生成 -->
+            </div>
+            
+            <div class="expense-chart-container">
+                <div class="chart-header">
+                    <h3>支出推移グラフ</h3>
+                    <div class="chart-controls">
+                        <select id="expenseChartPeriod" class="form-select">
+                            <option value="7">過去7日間</option>
+                            <option value="30" selected>過去30日間</option>
+                            <option value="90">過去90日間</option>
+                            <option value="365">過去1年間</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <canvas id="expenseTrendChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>支出項目</th>
+                            <th>プロジェクト</th>
+                            <th>日付</th>
+                            <th>金額</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTableBody">
+                        <!-- JavaScriptで動的に生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- レポート画面 -->
+        <section id="reports" class="page-section">
+            <div class="page-header">
+                <h2>レポート・分析</h2>
+                <div class="report-controls">
+                    <button class="btn btn-secondary" id="exportReportBtn">
+                        <i class="fas fa-download"></i>
+                        エクスポート
+                    </button>
+                    <button class="btn btn-secondary" id="printReportBtn">
+                        <i class="fas fa-print"></i>
+                        印刷
+                    </button>
+                </div>
+            </div>
+            
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>プロジェクト進捗サマリー</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="reportProgressChart"></div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>工数分析</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="reportHoursChart"></div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>予算管理</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="reportBudgetChart"></div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="card-header">
+                        <h3>期限管理</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="deadline-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="overdueCount">0</span>
+                                <span class="stat-label">期限切れ</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="dueSoonCount">0</span>
+                                <span class="stat-label">期限が近い</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="onTrackCount">0</span>
+                                <span class="stat-label">順調</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 設定画面 -->
+        <section id="settings" class="page-section">
+            <div class="page-header">
+                <h2>設定</h2>
+            </div>
+            
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h3>一般設定</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="generalSettingsForm">
+                            <div class="form-group">
+                                <label for="language">言語:</label>
+                                <select id="language" name="language" class="form-select">
+                                    <option value="ja">日本語</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="currency">通貨:</label>
+                                <select id="currency" name="currency" class="form-select">
+                                    <option value="JPY">円 (¥)</option>
+                                    <option value="USD">ドル ($)</option>
+                                    <option value="EUR">ユーロ (€)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="timezone">タイムゾーン:</label>
+                                <select id="timezone" name="timezone" class="form-select">
+                                    <option value="Asia/Tokyo">Asia/Tokyo (UTC+9)</option>
+                                    <option value="UTC">UTC</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h3>データ管理</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-actions">
+                            <button class="btn btn-secondary" id="exportDataBtn">
+                                <i class="fas fa-download"></i>
+                                データをエクスポート
+                            </button>
+                            <button class="btn btn-secondary" id="importDataBtn">
+                                <i class="fas fa-upload"></i>
+                                データをインポート
+                            </button>
+                            <input type="file" id="importFileInput" accept=".json,.enc" style="display: none;">
+                            <button class="btn btn-error" id="clearDataBtn">
+                                <i class="fas fa-trash"></i>
+                                データをクリア
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h3>通知設定</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="emailNotifications" name="emailNotifications">
+                                メール通知を有効にする
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="browserNotifications" name="browserNotifications" checked>
+                                ブラウザ通知を有効にする
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="notificationTime">通知時間:</label>
+                            <select id="notificationTime" name="notificationTime" class="form-select">
+                                <option value="9">9:00</option>
+                                <option value="12">12:00</option>
+                                <option value="17">17:00</option>
+                                <option value="18">18:00</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- データ管理画面 -->
+
+    </main>
+
+    <!-- プロジェクト作成・編集モーダル -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="projectModalTitle">新規プロジェクト作成</h3>
+                <button class="modal-close" id="projectModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <div class="form-group">
+                        <label for="projectName" class="form-label">プロジェクト名 *</label>
+                        <input type="text" id="projectName" name="projectName" class="form-input" required maxlength="100" placeholder="プロジェクト名を入力">
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDescription" class="form-label">説明</label>
+                        <textarea id="projectDescription" name="projectDescription" class="form-textarea" maxlength="500" placeholder="プロジェクトの説明を入力"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="projectStartDate" class="form-label">開始日 *</label>
+                            <input type="date" id="projectStartDate" name="projectStartDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectEndDate" class="form-label">期限 *</label>
+                            <input type="date" id="projectEndDate" name="projectEndDate" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectBudget" class="form-label">予算 *</label>
+                        <input type="number" id="projectBudget" name="projectBudget" class="form-input" required min="0" placeholder="予算を入力">
+                    </div>
+                    <div class="form-group">
+                        <label for="projectStatus" class="form-label">ステータス *</label>
+                        <select id="projectStatus" name="projectStatus" class="form-select" required>
+                            <option value="">ステータスを選択</option>
+                            <option value="planned">計画中</option>
+                            <option value="in-progress">進行中</option>
+                            <option value="completed">完了</option>
+                            <option value="on-hold">保留</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="projectModalCancel">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="projectForm">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- タスク作成・編集モーダル -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="taskModalTitle">新規タスク作成</h3>
+                <button class="modal-close" id="taskModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskName" class="form-label">タスク名 *</label>
+                        <input type="text" id="taskName" name="taskName" class="form-input" required maxlength="100" placeholder="タスク名を入力">
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription" class="form-label">説明</label>
+                        <textarea id="taskDescription" name="taskDescription" class="form-textarea" maxlength="500" placeholder="タスクの説明を入力"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskProject" class="form-label">プロジェクト *</label>
+                            <select id="taskProject" name="taskProject" class="form-select" required>
+                                <option value="">プロジェクトを選択</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPriority" class="form-label">優先度 *</label>
+                            <select id="taskPriority" name="taskPriority" class="form-select" required>
+                                <option value="">優先度を選択</option>
+                                <option value="high">高</option>
+                                <option value="medium">中</option>
+                                <option value="low">低</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskDueDate" class="form-label">期限 *</label>
+                            <input type="date" id="taskDueDate" name="taskDueDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskEstimatedHours" class="form-label">予想工数 (時間) *</label>
+                            <input type="number" id="taskEstimatedHours" name="taskEstimatedHours" class="form-input" required min="0" step="0.5" placeholder="予想工数を入力">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="taskModalCancel">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="taskForm">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- データインポートモーダル -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">データをインポート</h3>
+                <button class="modal-close" id="importModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm">
+                    <div class="form-group">
+                        <label for="importFile" class="form-label">ファイルを選択 *</label>
+                        <input type="file" id="importFile" name="importFile" class="form-input" accept=".json,.enc" required>
+                        <small class="form-help">JSONファイルまたは暗号化されたファイル(.enc)を選択してください</small>
+                    </div>
+                    <div class="form-group" id="importPasswordFields" style="display: none;">
+                        <label for="importPassword" class="form-label">パスワード *</label>
+                        <input type="password" id="importPassword" name="importPassword" class="form-input" placeholder="パスワードを入力">
+                        <small class="form-help">暗号化されたファイルの場合はパスワードが必要です</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="overwriteData" name="overwriteData">
+                            既存のデータを上書きする
+                        </label>
+                        <small class="form-help">チェックを外すと既存データとマージされます</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="importModalCancel">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="importForm">インポート</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- データエクスポートモーダル -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">データをエクスポート</h3>
+                <button class="modal-close" id="exportModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm">
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enablePassword" name="enablePassword">
+                            パスワード保護を有効にする
+                        </label>
+                    </div>
+                    <div class="form-group" id="passwordFields" style="display: none;">
+                        <label for="exportPassword" class="form-label">パスワード *</label>
+                        <input type="password" id="exportPassword" name="exportPassword" class="form-input" minlength="6" placeholder="6文字以上のパスワードを入力">
+                    </div>
+                    <div class="form-group" id="passwordConfirmFields" style="display: none;">
+                        <label for="exportPasswordConfirm" class="form-label">パスワード確認 *</label>
+                        <input type="password" id="exportPasswordConfirm" name="exportPasswordConfirm" class="form-input" minlength="6" placeholder="パスワードを再入力">
+                    </div>
+                    <div class="form-group">
+                        <label for="exportFilename" class="form-label">ファイル名</label>
+                        <input type="text" id="exportFilename" name="exportFilename" class="form-input" value="project-data" placeholder="ファイル名を入力">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="exportModalCancel">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="exportForm">エクスポート</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支出記録・編集モーダル -->
+    <div class="modal-overlay" id="expenseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="expenseModalTitle">新規支出記録</h3>
+                <button class="modal-close" id="expenseModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label for="expenseItem" class="form-label">支出項目 *</label>
+                        <input type="text" id="expenseItem" name="expenseItem" class="form-input" required maxlength="100" placeholder="支出項目を入力">
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseProject" class="form-label">プロジェクト *</label>
+                        <select id="expenseProject" name="expenseProject" class="form-select" required>
+                            <option value="">プロジェクトを選択</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseDate" class="form-label">支出日 *</label>
+                            <input type="date" id="expenseDate" name="expenseDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount" class="form-label">金額 *</label>
+                            <input type="number" id="expenseAmount" name="expenseAmount" class="form-input" required min="0" placeholder="金額を入力">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseMemo" class="form-label">メモ</label>
+                        <textarea id="expenseMemo" name="expenseMemo" class="form-textarea" maxlength="500" placeholder="メモを入力"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="expenseModalCancel">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="expenseForm">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/models/Project.js"></script>
+    <script src="js/models/Task.js"></script>
+    <script src="js/models/Expense.js"></script>
+    <script src="js/utils/Storage.js"></script>
+    <script src="js/utils/Validation.js"></script>
+    <script src="js/utils/ChartHelper.js"></script>
+    <script src="js/utils/CryptoHelper.js"></script>
+    <script src="js/utils/DataManager.js"></script>
+
+    <script src="js/managers/EventManager.js"></script>
+    <script src="js/managers/ProjectManager.js"></script>
+    <script src="js/managers/TaskManager.js"></script>
+    <script src="js/managers/ProgressManager.js"></script>
+    <script src="js/managers/ExpenseManager.js"></script>
+    <script src="js/views/DashboardView.js"></script>
+     <script src="js/views/ProjectView.js"></script>
+     <script src="js/views/TaskView.js"></script>
+     <script src="js/views/GanttView.js"></script>
+     <script src="js/views/ExpenseView.js"></script>
+
+     <script src="js/main.js"></script>
+</body>
+</html>
+
+
+
