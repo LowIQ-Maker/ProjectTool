@@ -4,7 +4,7 @@
  */
 class AnalyticsHelper {
     constructor() {
-        // Storageクラスのメソッドを直接使用するため、storageプロパティは不要
+        this.storage = new Storage();
     }
 
     /**
@@ -12,10 +12,10 @@ class AnalyticsHelper {
      * 過去のデータから将来の進捗を予測
      */
     calculateProgressPrediction(projectId) {
-        const project = Storage.getProject(projectId);
+        const project = this.storage.getProject(projectId);
         if (!project) return null;
 
-        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
+        const tasks = this.storage.getTasks().filter(t => t.projectId === projectId);
         const completedTasks = tasks.filter(t => t.status === 'completed');
         const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
         const pendingTasks = tasks.filter(t => t.status === 'pending');
@@ -60,11 +60,11 @@ class AnalyticsHelper {
      * プロジェクトの効率性スコアを計算
      */
     calculateEfficiencyScore(projectId) {
-        const project = Storage.getProject(projectId);
+        const project = this.storage.getProject(projectId);
         if (!project) return 0;
 
-        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
-        const expenses = Storage.getExpenses().filter(e => e.projectId === projectId);
+        const tasks = this.storage.getTasks().filter(t => t.projectId === projectId);
+        const expenses = this.storage.getExpenses().filter(e => e.projectId === projectId);
         
         // 予算使用率
         const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -91,8 +91,8 @@ class AnalyticsHelper {
      * チームの生産性分析
      */
     analyzeTeamProductivity() {
-        const projects = Storage.getProjects();
-        const tasks = Storage.getTasks();
+        const projects = this.storage.getProjects();
+        const tasks = this.storage.getTasks();
         
         const productivityData = projects.map(project => {
             const projectTasks = tasks.filter(t => t.projectId === project.id);
@@ -114,8 +114,8 @@ class AnalyticsHelper {
      * 予算トレンドの分析
      */
     analyzeBudgetTrends() {
-        const projects = Storage.getProjects();
-        const expenses = Storage.getExpenses();
+        const projects = this.storage.getProjects();
+        const expenses = this.storage.getExpenses();
         
         // 月別の支出データを集計
         const monthlyExpenses = {};
@@ -143,8 +143,8 @@ class AnalyticsHelper {
      * プロジェクトの依存関係を分析
      */
     analyzeProjectDependencies() {
-        const projects = Storage.getProjects();
-        const tasks = Storage.getTasks();
+        const projects = this.storage.getProjects();
+        const tasks = this.storage.getTasks();
         
         const dependencies = [];
         
@@ -186,10 +186,10 @@ class AnalyticsHelper {
      * プロジェクトのリスクレベルを計算
      */
     calculateProjectRiskLevel(projectId) {
-        const project = Storage.getProject(projectId);
+        const project = this.storage.getProject(projectId);
         if (!project) return 'low';
 
-        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
+        const tasks = this.storage.getTasks().filter(t => t.projectId === projectId);
         const criticalTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'completed');
         const overdueTasks = tasks.filter(t => {
             if (t.status === 'completed') return false;
@@ -221,7 +221,7 @@ class AnalyticsHelper {
      * タスクの依存関係を特定
      */
     findTaskDependencies(taskId) {
-        const tasks = Storage.getTasks();
+        const tasks = this.storage.getTasks();
         const task = tasks.find(t => t.id === taskId);
         
         if (!task || !task.dependencies) return [];
@@ -241,7 +241,7 @@ class AnalyticsHelper {
      * 総合的なプロジェクトヘルススコアを計算
      */
     calculateProjectHealthScore(projectId) {
-        const project = Storage.getProject(projectId);
+        const project = this.storage.getProject(projectId);
         if (!project) return 0;
 
         const progressPrediction = this.calculateProgressPrediction(projectId);
@@ -263,7 +263,7 @@ class AnalyticsHelper {
      * 改善提案を生成
      */
     generateImprovementSuggestions(projectId) {
-        const project = Storage.getProject(projectId);
+        const project = this.storage.getProject(projectId);
         if (!project) return [];
 
         const suggestions = [];
