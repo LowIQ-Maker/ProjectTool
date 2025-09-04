@@ -1913,3 +1913,5 @@ function initDataManager() {
         console.error('データ管理の初期化エラー:', error);
     }
 }
+
+// テスト用のコメント - 自動コミットテスト用
