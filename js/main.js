@@ -34,8 +34,8 @@ function initApp() {
     // フォームの初期化
     initForms();
     
-    // 初期ダッシュボードの更新
-    updateDashboard();
+    // 初期ダッシュボードの更新（必要最小限に制限）
+    // updateDashboard(); // コメントアウト
     
     // ヘッダーの新規プロジェクトボタンの初期化
     initHeaderProjectButton();
