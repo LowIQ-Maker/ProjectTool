@@ -514,14 +514,15 @@ class DataManager {
                 const pageId = currentSection.id;
                 console.log('DataManager: 現在のページID:', pageId);
                 
-                // ページに応じてUIを更新
-                if (window.switchPage && typeof window.switchPage === 'function') {
-                    window.switchPage(pageId);
-                } else {
-                    // フォールバック: ダッシュボードを更新
+                // ページに応じてUIを更新（ダッシュボード以外は再初期化のみ）
+                if (pageId === 'dashboard') {
                     if (window.updateDashboard && typeof window.updateDashboard === 'function') {
                         window.updateDashboard();
                     }
+                } else {
+                    // ダッシュボード以外のページは、現在のページの内容を再読み込み
+                    // ページの再初期化は行わず、データの更新のみ
+                    console.log('DataManager: 現在のページを維持:', pageId);
                 }
             }
             
@@ -535,13 +536,25 @@ class DataManager {
         try {
             console.log('DataManager: データ削除後のUI更新を開始');
             
-            // ダッシュボードに戻る
-            if (window.switchPage && typeof window.switchPage === 'function') {
-                window.switchPage('dashboard');
+            // 現在のページを確認
+            const currentSection = document.querySelector('.page-section.active, .dashboard-section.active');
+            if (currentSection) {
+                const pageId = currentSection.id;
+                console.log('DataManager: 現在のページID:', pageId);
+                
+                // 現在のページを維持し、必要に応じて再初期化
+                if (pageId === 'dashboard') {
+                    if (window.updateDashboard && typeof window.updateDashboard === 'function') {
+                        window.updateDashboard();
+                    }
+                } else {
+                    // ダッシュボード以外のページは、現在のページを維持
+                    console.log('DataManager: 現在のページを維持:', pageId);
+                }
             } else {
-                // フォールバック: ダッシュボードを更新
-                if (window.updateDashboard && typeof window.updateDashboard === 'function') {
-                    window.updateDashboard();
+                // アクティブなページがない場合は、ダッシュボードに戻る
+                if (window.switchPage && typeof window.switchPage === 'function') {
+                    window.switchPage('dashboard');
                 }
             }
             
