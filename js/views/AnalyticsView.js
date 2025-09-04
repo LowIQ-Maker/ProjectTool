@@ -543,12 +543,33 @@ class AnalyticsView {
                 return;
             }
 
+            // 既存のチャートインスタンスを確実に破棄
             if (this.charts.productivity) {
-                this.charts.productivity.destroy();
+                try {
+                    this.charts.productivity.destroy();
+                    console.log('AnalyticsView.renderProductivityChart: 既存のproductivityチャートを破棄');
+                } catch (error) {
+                    console.warn('AnalyticsView.renderProductivityChart: チャート破棄エラー:', error);
+                }
+                this.charts.productivity = null;
             }
 
             // キャンバスの内容をクリア
             ctx.innerHTML = '';
+            
+            // Chart.jsのインスタンスIDをリセット
+            if (typeof Chart !== 'undefined' && Chart.instances) {
+                Object.keys(Chart.instances).forEach(id => {
+                    if (Chart.instances[id] && Chart.instances[id].canvas && Chart.instances[id].canvas.id === 'productivityChart') {
+                        try {
+                            Chart.instances[id].destroy();
+                            console.log('AnalyticsView.renderProductivityChart: Chart.instancesからproductivityチャートを破棄:', id);
+                        } catch (error) {
+                            console.warn('AnalyticsView.renderProductivityChart: Chart.instances破棄エラー:', error);
+                        }
+                    }
+                });
+            }
 
             // データが空の場合の処理
             if (!data || data.length === 0) {
@@ -624,12 +645,33 @@ class AnalyticsView {
                 return;
             }
 
+            // 既存のチャートインスタンスを確実に破棄
             if (this.charts.budget) {
-                this.charts.budget.destroy();
+                try {
+                    this.charts.budget.destroy();
+                    console.log('AnalyticsView.renderBudgetChart: 既存のbudgetチャートを破棄');
+                } catch (error) {
+                    console.warn('AnalyticsView.renderBudgetChart: チャート破棄エラー:', error);
+                }
+                this.charts.budget = null;
             }
 
             // キャンバスの内容をクリア
             ctx.innerHTML = '';
+            
+            // Chart.jsのインスタンスIDをリセット
+            if (typeof Chart !== 'undefined' && Chart.instances) {
+                Object.keys(Chart.instances).forEach(id => {
+                    if (Chart.instances[id] && Chart.instances[id].canvas && Chart.instances[id].canvas.id === 'budgetChart') {
+                        try {
+                            Chart.instances[id].destroy();
+                            console.log('AnalyticsView.renderBudgetChart: Chart.instancesからbudgetチャートを破棄:', id);
+                        } catch (error) {
+                            console.warn('AnalyticsView.renderBudgetChart: Chart.instances破棄エラー:', error);
+                        }
+                    }
+                });
+            }
 
             // データが空の場合の処理
             if (!data || data.length === 0) {
