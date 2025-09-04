@@ -4,7 +4,7 @@
  */
 class AnalyticsHelper {
     constructor() {
-        this.storage = new Storage();
+        // Storageクラスのメソッドを直接使用するため、storageプロパティは不要
     }
 
     /**
@@ -12,10 +12,10 @@ class AnalyticsHelper {
      * 過去のデータから将来の進捗を予測
      */
     calculateProgressPrediction(projectId) {
-        const project = this.storage.getProject(projectId);
+        const project = Storage.getProject(projectId);
         if (!project) return null;
 
-        const tasks = this.storage.getTasks().filter(t => t.projectId === projectId);
+        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
         const completedTasks = tasks.filter(t => t.status === 'completed');
         const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
         const pendingTasks = tasks.filter(t => t.status === 'pending');
@@ -60,11 +60,11 @@ class AnalyticsHelper {
      * プロジェクトの効率性スコアを計算
      */
     calculateEfficiencyScore(projectId) {
-        const project = this.storage.getProject(projectId);
+        const project = Storage.getProject(projectId);
         if (!project) return 0;
 
-        const tasks = this.storage.getTasks().filter(t => t.projectId === projectId);
-        const expenses = this.storage.getExpenses().filter(e => e.projectId === projectId);
+        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
+        const expenses = Storage.getExpenses().filter(e => e.projectId === projectId);
         
         // 予算使用率
         const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -91,8 +91,8 @@ class AnalyticsHelper {
      * チームの生産性分析
      */
     analyzeTeamProductivity() {
-        const projects = this.storage.getProjects();
-        const tasks = this.storage.getTasks();
+        const projects = Storage.getProjects();
+        const tasks = Storage.getTasks();
         
         const productivityData = projects.map(project => {
             const projectTasks = tasks.filter(t => t.projectId === project.id);
@@ -101,72 +101,50 @@ class AnalyticsHelper {
             return {
                 projectId: project.id,
                 projectName: project.name,
+                completionRate: projectTasks.length > 0 ? completedTasks.length / projectTasks.length : 0,
                 totalTasks: projectTasks.length,
-                completedTasks: completedTasks.length,
-                completionRate: projectTasks.length > 0 ? (completedTasks.length / projectTasks.length) : 0,
-                averageTaskDuration: this.calculateAverageTaskDuration(projectTasks)
+                completedTasks: completedTasks.length
             };
         });
         
-        return productivityData.sort((a, b) => b.completionRate - a.completionRate);
+        return productivityData;
     }
 
     /**
-     * タスクの平均完了期間を計算
-     */
-    calculateAverageTaskDuration(tasks) {
-        const completedTasks = tasks.filter(t => t.status === 'completed' && t.completedAt && t.createdAt);
-        
-        if (completedTasks.length === 0) return 0;
-        
-        const totalDuration = completedTasks.reduce((sum, task) => {
-            const created = new Date(task.createdAt);
-            const completed = new Date(task.completedAt);
-            return sum + (completed - created);
-        }, 0);
-        
-        return Math.round(totalDuration / (completedTasks.length * 24 * 60 * 60 * 1000)); // 日数
-    }
-
-    /**
-     * 予算の使用傾向を分析
+     * 予算トレンドの分析
      */
     analyzeBudgetTrends() {
-        const projects = this.storage.getProjects();
-        const expenses = this.storage.getExpenses();
+        const projects = Storage.getProjects();
+        const expenses = Storage.getExpenses();
         
-        const monthlyData = {};
+        // 月別の支出データを集計
+        const monthlyExpenses = {};
         
         expenses.forEach(expense => {
-            const month = expense.date.substring(0, 7); // YYYY-MM
-            if (!monthlyData[month]) {
-                monthlyData[month] = {
-                    totalExpense: 0,
-                    projectCount: new Set(),
-                    expenseCount: 0
-                };
-            }
+            const date = new Date(expense.date);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
             
-            monthlyData[month].totalExpense += expense.amount;
-            monthlyData[month].projectCount.add(expense.projectId);
-            monthlyData[month].expenseCount++;
+            if (!monthlyExpenses[monthKey]) {
+                monthlyExpenses[monthKey] = 0;
+            }
+            monthlyExpenses[monthKey] += expense.amount;
         });
         
-        return Object.entries(monthlyData).map(([month, data]) => ({
-            month,
-            totalExpense: data.totalExpense,
-            projectCount: data.projectCount.size,
-            expenseCount: data.expenseCount,
-            averageExpense: Math.round(data.totalExpense / data.expenseCount)
+        // 月別データを配列に変換
+        const budgetData = Object.keys(monthlyExpenses).map(month => ({
+            month: month,
+            totalExpense: monthlyExpenses[month]
         })).sort((a, b) => a.month.localeCompare(b.month));
+        
+        return budgetData;
     }
 
     /**
      * プロジェクトの依存関係を分析
      */
     analyzeProjectDependencies() {
-        const projects = this.storage.getProjects();
-        const tasks = this.storage.getTasks();
+        const projects = Storage.getProjects();
+        const tasks = Storage.getTasks();
         
         const dependencies = [];
         
@@ -175,73 +153,29 @@ class AnalyticsHelper {
             const criticalTasks = projectTasks.filter(t => t.priority === 'high' && t.status !== 'completed');
             
             if (criticalTasks.length > 0) {
-                dependencies.push({
-                    projectId: project.id,
-                    projectName: project.name,
-                    criticalTaskCount: criticalTasks.length,
-                    riskLevel: this.calculateProjectRiskLevel(project, criticalTasks),
-                    dependencies: this.findTaskDependencies(criticalTasks, projectTasks)
+                // 依存関係のあるタスクを特定
+                const dependentTasks = criticalTasks.filter(task => {
+                    // 他のタスクがこのタスクに依存しているかチェック
+                    return projectTasks.some(otherTask => 
+                        otherTask.id !== task.id && 
+                        otherTask.dependencies && 
+                        otherTask.dependencies.includes(task.id)
+                    );
                 });
-            }
-        });
-        
-        return dependencies.sort((a, b) => b.riskLevel - a.riskLevel);
-    }
-
-    /**
-     * プロジェクトのリスクレベルを計算
-     */
-    calculateProjectRiskLevel(project, criticalTasks) {
-        const today = new Date();
-        const endDate = new Date(project.endDate);
-        const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
-        
-        let riskScore = 0;
-        
-        // 期限が近いほどリスクが高い
-        if (remainingDays <= 7) riskScore += 30;
-        else if (remainingDays <= 14) riskScore += 20;
-        else if (remainingDays <= 30) riskScore += 10;
-        
-        // 重要なタスクが多いほどリスクが高い
-        riskScore += criticalTasks.length * 15;
-        
-        // 予算使用率が高いほどリスクが高い
-        const expenses = this.storage.getExpenses().filter(e => e.projectId === project.id);
-        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
-        const budgetUsage = project.budget > 0 ? (totalExpense / project.budget) : 0;
-        
-        if (budgetUsage > 0.9) riskScore += 25;
-        else if (budgetUsage > 0.7) riskScore += 15;
-        
-        return Math.min(100, riskScore);
-    }
-
-    /**
-     * タスクの依存関係を検索
-     */
-    findTaskDependencies(criticalTasks, allTasks) {
-        const dependencies = [];
-        
-        criticalTasks.forEach(task => {
-            // 同じプロジェクト内で、このタスクの完了を待つ必要があるタスクを検索
-            const dependentTasks = allTasks.filter(t => 
-                t.id !== task.id && 
-                t.status !== 'completed' &&
-                t.dueDate > task.dueDate
-            );
-            
-            if (dependentTasks.length > 0) {
-                dependencies.push({
-                    taskId: task.id,
-                    taskName: task.name,
-                    dependentTaskCount: dependentTasks.length,
-                    dependentTasks: dependentTasks.map(t => ({
-                        id: t.id,
-                        name: t.name,
-                        dueDate: t.dueDate
-                    }))
-                });
+                
+                if (dependentTasks.length > 0) {
+                    dependencies.push({
+                        projectId: project.id,
+                        projectName: project.name,
+                        riskLevel: this.calculateProjectRiskLevel(project.id),
+                        criticalTaskCount: criticalTasks.length,
+                        dependencies: dependentTasks.map(task => ({
+                            taskId: task.id,
+                            taskName: task.name,
+                            dueDate: task.dueDate
+                        }))
+                    });
+                }
             }
         });
         
@@ -249,10 +183,65 @@ class AnalyticsHelper {
     }
 
     /**
+     * プロジェクトのリスクレベルを計算
+     */
+    calculateProjectRiskLevel(projectId) {
+        const project = Storage.getProject(projectId);
+        if (!project) return 'low';
+
+        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
+        const criticalTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'completed');
+        const overdueTasks = tasks.filter(t => {
+            if (t.status === 'completed') return false;
+            const dueDate = new Date(t.dueDate);
+            const today = new Date();
+            return dueDate < today;
+        });
+
+        let riskScore = 0;
+        
+        if (criticalTasks.length > 3) riskScore += 30;
+        else if (criticalTasks.length > 1) riskScore += 20;
+        
+        if (overdueTasks.length > 0) riskScore += 25;
+        
+        const today = new Date();
+        const endDate = new Date(project.endDate);
+        const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (remainingDays <= 7) riskScore += 30;
+        else if (remainingDays <= 14) riskScore += 20;
+        
+        if (riskScore >= 60) return 'high';
+        if (riskScore >= 30) return 'medium';
+        return 'low';
+    }
+
+    /**
+     * タスクの依存関係を特定
+     */
+    findTaskDependencies(taskId) {
+        const tasks = Storage.getTasks();
+        const task = tasks.find(t => t.id === taskId);
+        
+        if (!task || !task.dependencies) return [];
+        
+        return task.dependencies.map(depId => {
+            const dependentTask = tasks.find(t => t.id === depId);
+            return dependentTask ? {
+                id: dependentTask.id,
+                name: dependentTask.name,
+                status: dependentTask.status,
+                dueDate: dependentTask.dueDate
+            } : null;
+        }).filter(Boolean);
+    }
+
+    /**
      * 総合的なプロジェクトヘルススコアを計算
      */
     calculateProjectHealthScore(projectId) {
-        const project = this.storage.getProject(projectId);
+        const project = Storage.getProject(projectId);
         if (!project) return 0;
 
         const progressPrediction = this.calculateProgressPrediction(projectId);
@@ -274,7 +263,7 @@ class AnalyticsHelper {
      * 改善提案を生成
      */
     generateImprovementSuggestions(projectId) {
-        const project = this.storage.getProject(projectId);
+        const project = Storage.getProject(projectId);
         if (!project) return [];
 
         const suggestions = [];

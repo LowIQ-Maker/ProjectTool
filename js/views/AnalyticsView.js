@@ -121,7 +121,7 @@ class AnalyticsView {
         const selector = document.getElementById('projectSelector');
         if (!selector) return;
 
-        const projects = this.analyticsHelper.storage.getProjects();
+        const projects = Storage.getProjects();
         projects.forEach(project => {
             const option = document.createElement('option');
             option.value = project.id;
@@ -179,7 +179,7 @@ class AnalyticsView {
 
     loadOverallAnalytics() {
         // 全体的な分析データを読み込み
-        const projects = this.analyticsHelper.storage.getProjects();
+        const projects = Storage.getProjects();
         if (projects.length === 0) return;
 
         // 平均ヘルススコアを計算
@@ -197,7 +197,7 @@ class AnalyticsView {
             return;
         }
 
-        const project = this.analyticsHelper.storage.getProject(this.currentProjectId);
+        const project = Storage.getProject(this.currentProjectId);
         if (!project) return;
 
         // ヘルススコアを更新
@@ -281,8 +281,8 @@ class AnalyticsView {
     updateRiskAnalysis() {
         if (!this.currentProjectId) return;
 
-        const project = this.analyticsHelper.storage.getProject(this.currentProjectId);
-        const tasks = this.analyticsHelper.storage.getTasks().filter(t => t.projectId === this.currentProjectId);
+        const project = Storage.getProject(this.currentProjectId);
+        const tasks = Storage.getTasks().filter(t => t.projectId === this.currentProjectId);
         const criticalTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'completed');
         const overdueTasks = tasks.filter(t => {
             if (t.status === 'completed') return false;
