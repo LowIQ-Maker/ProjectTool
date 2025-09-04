@@ -704,9 +704,19 @@ class AnalyticsView {
             if (container) {
                 container.style.height = '400px';
                 container.style.width = '100%';
+                container.style.position = 'relative';
+                
+                // キャンバスのサイズを強制的に設定
+                ctx.width = 800;
+                ctx.height = 400;
                 ctx.style.width = '100%';
                 ctx.style.height = '400px';
+                ctx.style.display = 'block';
+                ctx.style.maxWidth = '100%';
+                ctx.style.maxHeight = '400px';
+                
                 console.log('AnalyticsView.renderBudgetChart: キャンバスサイズを設定しました');
+                console.log('AnalyticsView.renderBudgetChart: キャンバスサイズ:', ctx.width, 'x', ctx.height);
             }
 
             // 既存のチャートインスタンスを確実に破棄
@@ -763,8 +773,7 @@ class AnalyticsView {
             
             const chartOptions = {
                 responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -806,8 +815,12 @@ class AnalyticsView {
                     this.charts.budget.resize();
                     this.charts.budget.update();
                     console.log('AnalyticsView.renderBudgetChart: チャートの表示を更新しました');
+                    
+                    // キャンバスの表示を確認
+                    console.log('AnalyticsView.renderBudgetChart: 最終キャンバスサイズ:', ctx.width, 'x', ctx.height);
+                    console.log('AnalyticsView.renderBudgetChart: キャンバススタイル:', ctx.style.cssText);
                 }
-            }, 100);
+            }, 200);
             
             console.log('AnalyticsView.renderBudgetChart: チャート作成完了');
             console.log('AnalyticsView.renderBudgetChart: 完了');
