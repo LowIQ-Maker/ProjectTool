@@ -199,6 +199,9 @@ function switchPage(pageId) {
             case 'reports':
                 initReportsPage();
                 break;
+            case 'analytics':
+                initAnalyticsPage();
+                break;
             case 'settings':
                 initSettingsPage();
                 break;
