@@ -547,6 +547,9 @@ class AnalyticsView {
                 this.charts.productivity.destroy();
             }
 
+            // キャンバスの内容をクリア
+            ctx.innerHTML = '';
+
             // データが空の場合の処理
             if (!data || data.length === 0) {
                 ctx.innerHTML = '<p class="no-data">プロジェクトデータがありません</p>';
@@ -624,6 +627,9 @@ class AnalyticsView {
             if (this.charts.budget) {
                 this.charts.budget.destroy();
             }
+
+            // キャンバスの内容をクリア
+            ctx.innerHTML = '';
 
             // データが空の場合の処理
             if (!data || data.length === 0) {
