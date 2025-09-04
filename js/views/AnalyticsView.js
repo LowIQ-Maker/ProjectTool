@@ -210,17 +210,35 @@ class AnalyticsView {
     }
 
     loadOverallAnalytics() {
-        // 全体的な分析データを読み込み
-        const projects = this.analyticsHelper.storage.getProjects();
-        if (projects.length === 0) return;
+        try {
+            console.log('AnalyticsView.loadOverallAnalytics: 開始');
+            // 全体的な分析データを読み込み
+            const projects = this.analyticsHelper.storage.getProjects();
+            if (projects.length === 0) {
+                console.log('AnalyticsView.loadOverallAnalytics: プロジェクトがありません');
+                return;
+            }
 
-        // 平均ヘルススコアを計算
-        const totalScore = projects.reduce((sum, project) => {
-            return sum + this.analyticsHelper.calculateProjectHealthScore(project.id);
-        }, 0);
-        const averageScore = Math.round(totalScore / projects.length);
+            console.log('AnalyticsView.loadOverallAnalytics: プロジェクト数:', projects.length);
 
-        this.updateHealthScore(averageScore, '全プロジェクト平均');
+            // 平均ヘルススコアを計算
+            const totalScore = projects.reduce((sum, project) => {
+                try {
+                    const score = this.analyticsHelper.calculateProjectHealthScore(project.id);
+                    console.log(`AnalyticsView.loadOverallAnalytics: プロジェクト ${project.id} のスコア:`, score);
+                    return sum + score;
+                } catch (error) {
+                    console.error(`AnalyticsView.loadOverallAnalytics: プロジェクト ${project.id} のスコア計算エラー:`, error);
+                    return sum; // エラーの場合は0を加算
+                }
+            }, 0);
+            const averageScore = Math.round(totalScore / projects.length);
+
+            this.updateHealthScore(averageScore, '全プロジェクト平均');
+            console.log('AnalyticsView.loadOverallAnalytics: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.loadOverallAnalytics: エラーが発生しました:', error);
+        }
     }
 
     loadProjectAnalytics() {
