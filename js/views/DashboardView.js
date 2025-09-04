@@ -281,8 +281,7 @@ class DashboardView {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1.5,
+                maintainAspectRatio: false,
                 animation: {
                     duration: 1000,
                     easing: 'easeInOutQuart'
@@ -380,8 +379,7 @@ class DashboardView {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1,
+                maintainAspectRatio: false,
                 animation: {
                     duration: 1000,
                     easing: 'easeInOutQuart'
@@ -479,8 +477,7 @@ class DashboardView {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1.5,
+                maintainAspectRatio: false,
                 animation: {
                     duration: 1000,
                     easing: 'easeInOutQuart'
