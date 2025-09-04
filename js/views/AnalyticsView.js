@@ -371,30 +371,52 @@ class AnalyticsView {
     }
 
     loadTabData(tabName) {
-        switch (tabName) {
-            case 'productivity':
-                this.loadProductivityData();
-                break;
-            case 'budget':
-                this.loadBudgetData();
-                break;
-            case 'dependencies':
-                this.loadDependenciesData();
-                break;
-            case 'suggestions':
-                this.loadSuggestionsData();
-                break;
+        try {
+            console.log('AnalyticsView.loadTabData: 開始', tabName);
+            switch (tabName) {
+                case 'productivity':
+                    this.loadProductivityData();
+                    break;
+                case 'budget':
+                    this.loadBudgetData();
+                    break;
+                case 'dependencies':
+                    this.loadDependenciesData();
+                    break;
+                case 'suggestions':
+                    this.loadSuggestionsData();
+                    break;
+                default:
+                    console.warn('AnalyticsView.loadTabData: 不明なタブ名:', tabName);
+            }
+            console.log('AnalyticsView.loadTabData: 完了', tabName);
+        } catch (error) {
+            console.error('AnalyticsView.loadTabData: エラーが発生しました:', tabName, error);
         }
     }
 
     loadProductivityData() {
-        const productivityData = this.analyticsHelper.analyzeTeamProductivity();
-        this.renderProductivityChart(productivityData);
+        try {
+            console.log('AnalyticsView.loadProductivityData: 開始');
+            const productivityData = this.analyticsHelper.analyzeTeamProductivity();
+            console.log('AnalyticsView.loadProductivityData: データ取得完了', productivityData);
+            this.renderProductivityChart(productivityData);
+            console.log('AnalyticsView.loadProductivityData: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.loadProductivityData: エラーが発生しました:', error);
+        }
     }
 
     loadBudgetData() {
-        const budgetData = this.analyticsHelper.analyzeBudgetTrends();
-        this.renderBudgetChart(budgetData);
+        try {
+            console.log('AnalyticsView.loadBudgetData: 開始');
+            const budgetData = this.analyticsHelper.analyzeBudgetTrends();
+            console.log('AnalyticsView.loadBudgetData: データ取得完了', budgetData);
+            this.renderBudgetChart(budgetData);
+            console.log('AnalyticsView.loadBudgetData: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.loadBudgetData: エラーが発生しました:', error);
+        }
     }
 
     loadDependenciesData() {

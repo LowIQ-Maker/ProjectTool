@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Analytics Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>Chart.js Test</h2>
+        <div id="chartTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Storage Test</h2>
+        <div id="storageTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>AnalyticsHelper Test</h2>
+        <div id="analyticsTest"></div>
+    </div>
+
+    <script>
+        // Chart.js テスト
+        function testChartJS() {
+            const div = document.getElementById('chartTest');
+            try {
+                if (typeof Chart === 'undefined') {
+                    div.innerHTML = '<p class="error">Chart.js が読み込まれていません</p>';
+                    return;
+                }
+                
+                div.innerHTML = '<p class="success">Chart.js が正常に読み込まれています</p>';
+                
+                // 簡単なチャートを作成
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 200;
+                div.appendChild(canvas);
+                
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Test1', 'Test2', 'Test3'],
+                        datasets: [{
+                            label: 'Test Data',
+                            data: [10, 20, 30],
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+                
+            } catch (error) {
+                div.innerHTML = '<p class="error">Chart.js エラー: ' + error.message + '</p>';
+            }
+        }
+        
+        // Storage テスト
+        function testStorage() {
+            const div = document.getElementById('storageTest');
+            try {
+                // Storage クラスが利用可能かチェック
+                if (typeof Storage === 'undefined') {
+                    div.innerHTML = '<p class="error">Storage クラスが読み込まれていません</p>';
+                    return;
+                }
+                
+                const storage = new Storage();
+                div.innerHTML = '<p class="success">Storage クラスが正常に読み込まれています</p>';
+                
+                // データ取得テスト
+                const projects = storage.getProjects();
+                const tasks = storage.getTasks();
+                const expenses = storage.getExpenses();
+                
+                div.innerHTML += `
+                    <p>プロジェクト数: ${projects.length}</p>
+                    <p>タスク数: ${tasks.length}</p>
+                    <p>支出数: ${expenses.length}</p>
+                `;
+                
+            } catch (error) {
+                div.innerHTML = '<p class="error">Storage エラー: ' + error.message + '</p>';
+            }
+        }
+        
+        // AnalyticsHelper テスト
+        function testAnalyticsHelper() {
+            const div = document.getElementById('analyticsTest');
+            try {
+                // AnalyticsHelper クラスが利用可能かチェック
+                if (typeof AnalyticsHelper === 'undefined') {
+                    div.innerHTML = '<p class="error">AnalyticsHelper クラスが読み込まれていません</p>';
+                    return;
+                }
+                
+                const analyticsHelper = new AnalyticsHelper();
+                div.innerHTML = '<p class="success">AnalyticsHelper クラスが正常に読み込まれています</p>';
+                
+                // 分析データ取得テスト
+                const productivityData = analyticsHelper.analyzeTeamProductivity();
+                const budgetData = analyticsHelper.analyzeBudgetTrends();
+                
+                div.innerHTML += `
+                    <p>生産性データ: ${productivityData.length}件</p>
+                    <p>予算データ: ${budgetData.length}件</p>
+                `;
+                
+            } catch (error) {
+                div.innerHTML = '<p class="error">AnalyticsHelper エラー: ' + error.message + '</p>';
+            }
+        }
+        
+        // ページ読み込み完了後にテスト実行
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testChartJS();
+                testStorage();
+                testAnalyticsHelper();
+            }, 1000);
+        });
+    </script>
+    
+    <!-- 必要なスクリプトを読み込み -->
+    <script src="js/utils/Storage.js"></script>
+    <script src="js/utils/AnalyticsHelper.js"></script>
+</body>
+</html>
