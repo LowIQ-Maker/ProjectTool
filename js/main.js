@@ -211,6 +211,12 @@ function switchPage(pageId) {
             case 'analytics':
                 initAnalyticsPage();
                 break;
+            case 'time-tracking':
+                initTimeTracking();
+                break;
+            case 'reports':
+                initReports();
+                break;
             case 'settings':
                 initSettingsPage();
                 break;
