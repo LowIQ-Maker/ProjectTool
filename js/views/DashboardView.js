@@ -7,6 +7,7 @@ class DashboardView {
         this.taskManager = new TaskManager();
         this.progressManager = new ProgressManager();
         this.eventManager = new EventManager();
+        this.charts = {}; // チャートインスタンスを管理
         this.init();
     }
 
@@ -29,7 +30,33 @@ class DashboardView {
         this.renderStats();
         this.renderProjectList();
         this.renderTaskList();
+        this.clearCharts(); // 既存のチャートをクリア
         this.renderCharts();
+    }
+
+    clearCharts() {
+        // すべてのチャートインスタンスを破棄
+        Object.values(this.charts).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                try {
+                    chart.destroy();
+                } catch (error) {
+                    console.warn('DashboardView.clearCharts: チャート破棄エラー:', error);
+                }
+            }
+        });
+        this.charts = {};
+
+        // Chart.jsのインスタンスもクリア
+        if (typeof Chart !== 'undefined' && Chart.instances) {
+            Object.keys(Chart.instances).forEach(id => {
+                try {
+                    Chart.instances[id].destroy();
+                } catch (error) {
+                    console.warn('DashboardView.clearCharts: Chart.instances破棄エラー:', error);
+                }
+            });
+        }
     }
 
     renderStats() {
@@ -191,8 +218,28 @@ class DashboardView {
         if (!canvas) return;
 
         // 既存のチャートを破棄
-        if (this.chartHelper) {
-            this.chartHelper.destroyChart(canvas);
+        if (this.charts.progress) {
+            try {
+                this.charts.progress.destroy();
+                console.log('DashboardView.renderProgressChart: 既存のprogressチャートを破棄');
+            } catch (error) {
+                console.warn('DashboardView.renderProgressChart: チャート破棄エラー:', error);
+            }
+            this.charts.progress = null;
+        }
+
+        // Chart.jsのインスタンスIDをリセット
+        if (typeof Chart !== 'undefined' && Chart.instances) {
+            Object.keys(Chart.instances).forEach(id => {
+                if (Chart.instances[id] && Chart.instances[id].canvas && Chart.instances[id].canvas.id === 'progressChart') {
+                    try {
+                        Chart.instances[id].destroy();
+                        console.log('DashboardView.renderProgressChart: Chart.instancesからprogressチャートを破棄:', id);
+                    } catch (error) {
+                        console.warn('DashboardView.renderProgressChart: Chart.instances破棄エラー:', error);
+                    }
+                }
+            });
         }
 
         const projects = this.projectManager.getProjects();
@@ -207,9 +254,11 @@ class DashboardView {
             return;
         }
 
-        // ChartHelperのインスタンスを保持
-        if (!this.chartHelper) {
-            this.chartHelper = new ChartHelper();
+        // Chart.jsが利用可能かチェック
+        if (typeof Chart === 'undefined') {
+            console.error('DashboardView.renderProgressChart: Chart.jsが読み込まれていません');
+            canvas.parentElement.innerHTML = '<p class="error">Chart.jsの読み込みに失敗しました</p>';
+            return;
         }
         
         const labels = projects.map(p => p.name);
@@ -218,34 +267,43 @@ class DashboardView {
             return this.progressManager.calculateProjectProgress(p.id);
         });
 
-        const chart = this.chartHelper.createBarChart(canvas, {
-            labels: labels,
-            datasets: [{
-                label: '進捗率 (%)',
-                data: data,
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        }, {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
+        this.charts.progress = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '進捗率 (%)',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'プロジェクト進捗率'
+                    }
                 }
             }
         });
 
-        if (!chart) {
-            canvas.parentElement.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>グラフの表示に失敗しました</h3>
-                    <p>Chart.jsの読み込みを確認してください</p>
-                </div>
-            `;
-        }
+        console.log('DashboardView.renderProgressChart: チャート作成完了');
     }
 
     renderTaskStatusChart() {
@@ -253,8 +311,28 @@ class DashboardView {
         if (!canvas) return;
 
         // 既存のチャートを破棄
-        if (this.chartHelper) {
-            this.chartHelper.destroyChart(canvas);
+        if (this.charts.taskStatus) {
+            try {
+                this.charts.taskStatus.destroy();
+                console.log('DashboardView.renderTaskStatusChart: 既存のtaskStatusチャートを破棄');
+            } catch (error) {
+                console.warn('DashboardView.renderTaskStatusChart: チャート破棄エラー:', error);
+            }
+            this.charts.taskStatus = null;
+        }
+
+        // Chart.jsのインスタンスIDをリセット
+        if (typeof Chart !== 'undefined' && Chart.instances) {
+            Object.keys(Chart.instances).forEach(id => {
+                if (Chart.instances[id] && Chart.instances[id].canvas && Chart.instances[id].canvas.id === 'taskStatusChart') {
+                    try {
+                        Chart.instances[id].destroy();
+                        console.log('DashboardView.renderTaskStatusChart: Chart.instancesからtaskStatusチャートを破棄:', id);
+                    } catch (error) {
+                        console.warn('DashboardView.renderTaskStatusChart: Chart.instances破棄エラー:', error);
+                    }
+                }
+            });
         }
 
         const taskStats = this.taskManager.getTaskStats();
