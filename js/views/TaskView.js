@@ -71,14 +71,18 @@ class TaskView {
                 <td>
                     <div class="task-name">
                         <strong>${task.name}</strong>
-                        <small>${task.description || '説明なし'}</small>
                     </div>
                 </td>
                 <td>${project ? project.name : '不明なプロジェクト'}</td>
+                <td>
+                    <div class="task-description">
+                        ${task.description || '説明なし'}
+                    </div>
+                </td>
                 <td><span class="priority-badge priority-${task.priority}">${task.getPriorityText()}</span></td>
-                <td><span class="status-badge status-${task.getStatusColor()}">${task.getStatusText()}</span></td>
                 <td>${task.dueDate}</td>
                 <td>${task.estimatedHours}h</td>
+                <td><span class="status-badge status-${task.getStatusColor()}">${task.getStatusText()}</span></td>
                 <td>
                     <button class="btn btn-secondary btn-sm" onclick="editTask('${task.id}')">
                         <i class="fas fa-edit"></i>

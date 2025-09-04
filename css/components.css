@@ -317,6 +317,32 @@
 .tasks-table-container .table th:nth-child(9),
 .tasks-table-container .table td:nth-child(9) { width: 12%; } /* 操作 */
 
+/* タスクテーブルのスタイル */
+.task-name {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.task-description {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-description:hover {
+    white-space: normal;
+    overflow: visible;
+    background: var(--gray-50);
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    position: relative;
+    z-index: 10;
+}
+
 /* テーブルのレスポンシブ対応 */
 @media (max-width: 768px) {
     .table-container {
