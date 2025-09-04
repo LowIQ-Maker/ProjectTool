@@ -581,12 +581,22 @@ function initForms() {
                 modalTitle.textContent = '新規プロジェクト作成';
             }
         });
+        
+        // 保存ボタンのクリックイベント
+        const projectSaveBtn = document.getElementById('projectModalSave');
+        if (projectSaveBtn) {
+            projectSaveBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formEvent = new Event('submit', { bubbles: true, cancelable: true });
+                projectForm.dispatchEvent(formEvent);
+            });
+        }
     }
     
     // タスクフォーム
     const taskForm = document.getElementById('taskForm');
     if (taskForm) {
-        taskForm.addEventListener('submit', handleTaskSubmit);
+        // フォーム送信イベントは削除（ボタンクリックで処理）
         
         // 日付の初期値を設定
         const dueDateInput = document.getElementById('taskDueDate');
@@ -604,12 +614,22 @@ function initForms() {
                 modalTitle.textContent = '新規タスク作成';
             }
         });
+        
+        // 保存ボタンのクリックイベント
+        const taskSaveBtn = document.getElementById('taskModalSave');
+        if (taskSaveBtn) {
+            taskSaveBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formEvent = new Event('submit', { bubbles: true, cancelable: true });
+                taskForm.dispatchEvent(formEvent);
+            });
+        }
     }
     
     // 支出フォーム
     const expenseForm = document.getElementById('expenseForm');
     if (expenseForm) {
-        expenseForm.addEventListener('submit', handleExpenseSubmit);
+        // フォーム送信イベントは削除（ボタンクリックで処理）
         
         // 日付の初期値を設定
         const expenseDateInput = document.getElementById('expenseDate');
@@ -625,6 +645,16 @@ function initForms() {
                 modalTitle.textContent = '新規支出記録';
             }
         });
+        
+        // 保存ボタンのクリックイベント
+        const expenseSaveBtn = document.getElementById('expenseModalSave');
+        if (expenseSaveBtn) {
+            expenseSaveBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const formEvent = new Event('submit', { bubbles: true, cancelable: true });
+                expenseForm.dispatchEvent(formEvent);
+            });
+        }
     }
     
     // プロジェクト選択肢を更新
