@@ -43,11 +43,14 @@ function initApp() {
     // プロジェクトページとタスクページのボタンも初期化
     initPageButtons();
     
-    // データ管理の初期化
-    initDataManager();
-    
-    
-}
+            // データ管理の初期化
+        initDataManager();
+        
+        // 分析ページの初期化
+        initAnalyticsPage();
+        
+        
+    }
 
 /**
  * モバイルメニューの初期化
@@ -1911,6 +1914,21 @@ function initDataManager() {
         console.log('データ管理が初期化されました');
     } catch (error) {
         console.error('データ管理の初期化エラー:', error);
+    }
+}
+
+/**
+ * 分析ページの初期化
+ */
+function initAnalyticsPage() {
+    try {
+        if (window.analyticsView) {
+            window.analyticsView.destroy();
+        }
+        window.analyticsView = new AnalyticsView();
+        console.log('分析ページが初期化されました');
+    } catch (error) {
+        console.error('分析ページの初期化エラー:', error);
     }
 }
 
