@@ -681,10 +681,13 @@ class AnalyticsView {
             console.log('AnalyticsView.renderBudgetChart: Chart.jsが利用可能です');
             
             const ctx = document.getElementById('budgetChart');
+            console.log('AnalyticsView.renderBudgetChart: budgetChart要素:', ctx);
             if (!ctx) {
                 console.error('AnalyticsView.renderBudgetChart: budgetChartキャンバスが見つかりません');
                 return;
             }
+            
+            console.log('AnalyticsView.renderBudgetChart: budgetChart要素が見つかりました');
 
             // 既存のチャートインスタンスを確実に破棄
             if (this.charts.budget) {
