@@ -431,13 +431,26 @@ class TimeTrackerView {
                     console.log('TimeTrackerView.bindEvents: dataset:', btn.dataset);
                     console.log('TimeTrackerView.bindEvents: data-view属性:', btn.getAttribute('data-view'));
                     
-                    const viewValue = btn.getAttribute('data-view') || btn.dataset.view;
+                    const viewValue = btn.getAttribute('data-view');
                     if (viewValue) {
                         this.currentView = viewValue;
                         console.log('TimeTrackerView.bindEvents: タブ切り替え:', this.currentView);
                         this.showCurrentView();
                     } else {
                         console.error('TimeTrackerView.bindEvents: data-view属性が見つかりません');
+                        // フォールバック: ボタンのテキストから判定
+                        const buttonText = btn.textContent.trim();
+                        if (buttonText.includes('アクティブ')) {
+                            this.currentView = 'active';
+                        } else if (buttonText.includes('履歴')) {
+                            this.currentView = 'summary';
+                        } else if (buttonText.includes('サマリー')) {
+                            this.currentView = 'summary';
+                        } else {
+                            this.currentView = 'active'; // デフォルト
+                        }
+                        console.log('TimeTrackerView.bindEvents: フォールバック判定結果:', this.currentView);
+                        this.showCurrentView();
                     }
                 }
             });
