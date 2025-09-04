@@ -18,6 +18,8 @@ class AnalyticsView {
             setTimeout(() => {
                 this.bindEvents();
                 this.loadAnalytics();
+                // 予算分析タブをデフォルトで表示
+                this.loadBudgetData();
             }, 100);
             console.log('AnalyticsView.init: 完了');
         } catch (error) {
@@ -89,23 +91,23 @@ class AnalyticsView {
 
                 <!-- 詳細分析セクション -->
                 <div class="detailed-analytics">
-                    <div class="analytics-tabs">
-                        <button class="tab-btn active" data-tab="productivity">生産性分析</button>
-                        <button class="tab-btn" data-tab="budget">予算分析</button>
-                        <button class="tab-btn" data-tab="dependencies">依存関係</button>
-                        <button class="tab-btn" data-tab="suggestions">改善提案</button>
-                    </div>
+                                            <div class="analytics-tabs">
+                            <button class="tab-btn" data-tab="productivity">生産性分析</button>
+                            <button class="tab-btn active" data-tab="budget">予算分析</button>
+                            <button class="tab-btn" data-tab="dependencies">依存関係</button>
+                            <button class="tab-btn" data-tab="suggestions">改善提案</button>
+                        </div>
 
                     <div class="tab-content">
                         <!-- 生産性分析タブ -->
-                        <div id="productivityTab" class="tab-pane active">
+                        <div id="productivityTab" class="tab-pane">
                             <div class="chart-container">
                                 <canvas id="productivityChart"></canvas>
                             </div>
                         </div>
 
                         <!-- 予算分析タブ -->
-                        <div id="budgetTab" class="tab-pane">
+                        <div id="budgetTab" class="tab-pane active">
                             <div class="chart-container">
                                 <canvas id="budgetChart"></canvas>
                             </div>
@@ -403,22 +405,27 @@ class AnalyticsView {
     loadTabData(tabName) {
         try {
             console.log('AnalyticsView.loadTabData: 開始', tabName);
-            switch (tabName) {
-                case 'productivity':
-                    this.loadProductivityData();
-                    break;
-                case 'budget':
-                    this.loadBudgetData();
-                    break;
-                case 'dependencies':
-                    this.loadDependenciesData();
-                    break;
-                case 'suggestions':
-                    this.loadSuggestionsData();
-                    break;
-                default:
-                    console.warn('AnalyticsView.loadTabData: 不明なタブ名:', tabName);
-            }
+            
+            // タブが切り替わった後に少し遅延してデータを読み込み
+            setTimeout(() => {
+                switch (tabName) {
+                    case 'productivity':
+                        this.loadProductivityData();
+                        break;
+                    case 'budget':
+                        this.loadBudgetData();
+                        break;
+                    case 'dependencies':
+                        this.loadDependenciesData();
+                        break;
+                    case 'suggestions':
+                        this.loadSuggestionsData();
+                        break;
+                    default:
+                        console.warn('AnalyticsView.loadTabData: 不明なタブ名:', tabName);
+                }
+            }, 100);
+            
             console.log('AnalyticsView.loadTabData: 完了', tabName);
         } catch (error) {
             console.error('AnalyticsView.loadTabData: エラーが発生しました:', tabName, error);
@@ -691,6 +698,16 @@ class AnalyticsView {
             }
             
             console.log('AnalyticsView.renderBudgetChart: budgetChart要素が見つかりました');
+            
+            // キャンバスのサイズを明示的に設定
+            const container = ctx.parentElement;
+            if (container) {
+                container.style.height = '400px';
+                container.style.width = '100%';
+                ctx.style.width = '100%';
+                ctx.style.height = '400px';
+                console.log('AnalyticsView.renderBudgetChart: キャンバスサイズを設定しました');
+            }
 
             // 既存のチャートインスタンスを確実に破棄
             if (this.charts.budget) {
@@ -746,7 +763,8 @@ class AnalyticsView {
             
             const chartOptions = {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -766,6 +784,10 @@ class AnalyticsView {
                         display: true,
                         position: 'top'
                     }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
                 }
             };
             
@@ -777,6 +799,16 @@ class AnalyticsView {
                 data: chartData,
                 options: chartOptions
             });
+            
+            // チャートの表示を強制的に更新
+            setTimeout(() => {
+                if (this.charts.budget) {
+                    this.charts.budget.resize();
+                    this.charts.budget.update();
+                    console.log('AnalyticsView.renderBudgetChart: チャートの表示を更新しました');
+                }
+            }, 100);
+            
             console.log('AnalyticsView.renderBudgetChart: チャート作成完了');
             console.log('AnalyticsView.renderBudgetChart: 完了');
         } catch (error) {
