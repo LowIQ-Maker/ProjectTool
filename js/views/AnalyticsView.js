@@ -133,16 +133,27 @@ class AnalyticsView {
     }
 
     populateProjectSelector() {
-        const selector = document.getElementById('projectSelector');
-        if (!selector) return;
+        try {
+            console.log('AnalyticsView.populateProjectSelector: 開始');
+            const selector = document.getElementById('projectSelector');
+            if (!selector) {
+                console.error('AnalyticsView.populateProjectSelector: projectSelectorが見つかりません');
+                return;
+            }
 
-        const projects = Storage.getProjects();
-        projects.forEach(project => {
-            const option = document.createElement('option');
-            option.value = project.id;
-            option.textContent = project.name;
-            selector.appendChild(option);
-        });
+            const projects = Storage.getProjects();
+            console.log('AnalyticsView.populateProjectSelector: プロジェクト数:', projects.length);
+            
+            projects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = project.name;
+                selector.appendChild(option);
+            });
+            console.log('AnalyticsView.populateProjectSelector: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.populateProjectSelector: エラーが発生しました:', error);
+        }
     }
 
     bindEvents() {
@@ -188,8 +199,14 @@ class AnalyticsView {
     }
 
     loadAnalytics() {
-        this.loadOverallAnalytics();
-        this.loadTabData('productivity');
+        try {
+            console.log('AnalyticsView.loadAnalytics: 開始');
+            this.loadOverallAnalytics();
+            this.loadTabData('productivity');
+            console.log('AnalyticsView.loadAnalytics: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.loadAnalytics: エラーが発生しました:', error);
+        }
     }
 
     loadOverallAnalytics() {
@@ -458,78 +475,96 @@ class AnalyticsView {
     }
 
     renderProductivityChart(data) {
-        const ctx = document.getElementById('productivityChart');
-        if (!ctx) return;
+        try {
+            console.log('AnalyticsView.renderProductivityChart: 開始', data);
+            const ctx = document.getElementById('productivityChart');
+            if (!ctx) {
+                console.error('AnalyticsView.renderProductivityChart: productivityChartキャンバスが見つかりません');
+                return;
+            }
 
-        if (this.charts.productivity) {
-            this.charts.productivity.destroy();
-        }
+            if (this.charts.productivity) {
+                this.charts.productivity.destroy();
+            }
 
-        this.charts.productivity = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.map(d => d.projectName),
-                datasets: [{
-                    label: '完了率 (%)',
-                    data: data.map(d => Math.round(d.completionRate * 100)),
-                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
-                    }
+            this.charts.productivity = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.projectName),
+                    datasets: [{
+                        label: '完了率 (%)',
+                        data: data.map(d => Math.round(d.completionRate * 100)),
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
                 },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'プロジェクト別完了率'
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'プロジェクト別完了率'
+                        }
                     }
                 }
-            }
-        });
+            });
+            console.log('AnalyticsView.renderProductivityChart: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.renderProductivityChart: エラーが発生しました:', error);
+        }
     }
 
     renderBudgetChart(data) {
-        const ctx = document.getElementById('budgetChart');
-        if (!ctx) return;
+        try {
+            console.log('AnalyticsView.renderBudgetChart: 開始', data);
+            const ctx = document.getElementById('budgetChart');
+            if (!ctx) {
+                console.error('AnalyticsView.renderBudgetChart: budgetChartキャンバスが見つかりません');
+                return;
+            }
 
-        if (this.charts.budget) {
-            this.charts.budget.destroy();
-        }
+            if (this.charts.budget) {
+                this.charts.budget.destroy();
+            }
 
-        this.charts.budget = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.map(d => d.month),
-                datasets: [{
-                    label: '月別支出 (円)',
-                    data: data.map(d => d.totalExpense),
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            this.charts.budget = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.month),
+                    datasets: [{
+                        label: '月別支出 (円)',
+                        data: data.map(d => d.totalExpense),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1
+                    }]
                 },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '月別支出傾向'
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '月別支出傾向'
+                        }
                     }
                 }
-            }
-        });
+            });
+            console.log('AnalyticsView.renderBudgetChart: 完了');
+        } catch (error) {
+            console.error('AnalyticsView.renderBudgetChart: エラーが発生しました:', error);
+        }
     }
 
     clearProjectAnalytics() {
