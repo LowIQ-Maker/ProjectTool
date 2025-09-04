@@ -503,6 +503,53 @@ class DataManager {
             }
         }, 3000);
     }
+
+    updateUIAfterImport() {
+        try {
+            console.log('DataManager: インポート後のUI更新を開始');
+            
+            // 現在のページを取得
+            const currentSection = document.querySelector('.page-section.active, .dashboard-section.active');
+            if (currentSection) {
+                const pageId = currentSection.id;
+                console.log('DataManager: 現在のページID:', pageId);
+                
+                // ページに応じてUIを更新
+                if (window.switchPage && typeof window.switchPage === 'function') {
+                    window.switchPage(pageId);
+                } else {
+                    // フォールバック: ダッシュボードを更新
+                    if (window.updateDashboard && typeof window.updateDashboard === 'function') {
+                        window.updateDashboard();
+                    }
+                }
+            }
+            
+            console.log('DataManager: インポート後のUI更新完了');
+        } catch (error) {
+            console.error('DataManager: UI更新エラー:', error);
+        }
+    }
+
+    updateUIAfterClear() {
+        try {
+            console.log('DataManager: データ削除後のUI更新を開始');
+            
+            // ダッシュボードに戻る
+            if (window.switchPage && typeof window.switchPage === 'function') {
+                window.switchPage('dashboard');
+            } else {
+                // フォールバック: ダッシュボードを更新
+                if (window.updateDashboard && typeof window.updateDashboard === 'function') {
+                    window.updateDashboard();
+                }
+            }
+            
+            console.log('DataManager: データ削除後のUI更新完了');
+        } catch (error) {
+            console.error('DataManager: UI更新エラー:', error);
+        }
+    }
 }
 
 // グローバルに公開
