@@ -259,29 +259,37 @@ class TimeTrackerView {
     }
 
     showCurrentView() {
-        // すべてのビューを非表示
-        document.querySelectorAll('.view-pane').forEach(pane => {
-            pane.classList.remove('active');
-        });
+        try {
+            // すべてのビューを非表示
+            document.querySelectorAll('.view-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
 
-        // 現在のビューを表示
-        const currentPane = document.getElementById(`${this.currentView}-view`);
-        if (currentPane) {
-            currentPane.classList.add('active');
-        }
+            // 現在のビューを表示
+            const currentPane = document.getElementById(`${this.currentView}-view`);
+            if (currentPane) {
+                currentPane.classList.add('active');
+            }
 
-        // タブのアクティブ状態を更新
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const activeTab = document.querySelector(`[data-view="${this.currentView}"]`);
-        if (activeTab) {
-            activeTab.classList.add('active');
-        }
+            // タブのアクティブ状態を更新
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeTab = document.querySelector(`[data-view="${this.currentView}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
 
-        // サマリービューの場合、チャートを描画
-        if (this.currentView === 'summary') {
-            this.renderWeeklyChart();
+            // サマリービューの場合、チャートを描画
+            if (this.currentView === 'summary') {
+                setTimeout(() => {
+                    this.renderWeeklyChart();
+                }, 100);
+            }
+            
+            console.log('TimeTrackerView.showCurrentView: 現在のビュー:', this.currentView);
+        } catch (error) {
+            console.error('TimeTrackerView.showCurrentView: エラーが発生しました:', error);
         }
     }
 
@@ -528,21 +536,33 @@ class TimeTrackerView {
     }
 
     startUpdateTimer() {
-        this.updateInterval = setInterval(() => {
-            this.updateActiveTimers();
-        }, 1000); // 1秒ごとに更新
+        try {
+            if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+            }
+            this.updateInterval = setInterval(() => {
+                this.updateActiveTimers();
+            }, 1000); // 1秒ごとに更新
+            console.log('TimeTrackerView.startUpdateTimer: 開始');
+        } catch (error) {
+            console.error('TimeTrackerView.startUpdateTimer: エラーが発生しました:', error);
+        }
     }
 
     updateActiveTimers() {
-        const activeTimers = this.timeTracker.getActiveTimers();
-        activeTimers.forEach(timer => {
-            const elapsedElement = document.querySelector(`[data-task-id="${timer.taskId}"] .elapsed-time`);
-            if (elapsedElement) {
-                elapsedElement.textContent = this.timeTracker.formatTime(
-                    this.timeTracker.getElapsedTime(timer.taskId)
-                );
-            }
-        });
+        try {
+            const activeTimers = this.timeTracker.getActiveTimers();
+            activeTimers.forEach(timer => {
+                const elapsedElement = document.querySelector(`[data-task-id="${timer.taskId}"] .elapsed-time`);
+                if (elapsedElement) {
+                    elapsedElement.textContent = this.timeTracker.formatTime(
+                        this.timeTracker.getElapsedTime(timer.taskId)
+                    );
+                }
+            });
+        } catch (error) {
+            console.error('TimeTrackerView.updateActiveTimers: エラーが発生しました:', error);
+        }
     }
 
     showNotification(message, type = 'info') {
