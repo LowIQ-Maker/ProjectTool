@@ -244,12 +244,17 @@ class TaskView {
                 <td>${task.dueDate}</td>
                 <td>${task.estimatedHours}h</td>
                 <td>
-                    <button class="btn btn-secondary btn-sm" onclick="editTask('${task.id}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-error btn-sm" onclick="deleteTask('${task.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <div class="task-actions">
+                        <button class="btn btn-primary btn-sm timer-btn" data-task-id="${task.id}" data-task-name="${task.name}">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="editTask('${task.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-error btn-sm" onclick="deleteTask('${task.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(row);
@@ -257,6 +262,9 @@ class TaskView {
         
         // チェックボックスのイベントをバインド
         this.bindCheckboxEvents();
+        
+        // タイマーボタンのイベントをバインド
+        this.bindTimerEvents();
     }
 
     searchTasks(query) {

@@ -933,4 +933,689 @@
     }
 }
 
+/* ===== タイムトラッキング ===== */
+.time-tracking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--white);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+}
+
+.view-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-tabs .tab-btn {
+    padding: 0.5rem 1rem;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.view-tabs .tab-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
+.view-tabs .tab-btn:hover:not(.active) {
+    background: var(--gray-200);
+}
+
+.view-pane {
+    display: none;
+}
+
+.view-pane.active {
+    display: block;
+}
+
+.timer-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+}
+
+.timer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.timer-header h3 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: 1.125rem;
+}
+
+.timer-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.timer-status.running {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.timer-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.elapsed-time {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-family: 'Courier New', monospace;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.timer-info {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.no-active-timers {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--gray-500);
+}
+
+.no-active-timers i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--gray-300);
+}
+
+.history-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.time-entry-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.entry-header h4 {
+    margin: 0;
+    color: var(--gray-900);
+}
+
+.entry-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.entry-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.entry-time, .entry-period {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.entry-time .label, .entry-period .label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.entry-time .value, .entry-period .value {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.summary-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.summary-card h3 {
+    margin: 0 0 1rem 0;
+    color: var(--gray-700);
+    font-size: 1rem;
+}
+
+.summary-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.summary-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.daily-breakdown h4, .weekly-chart h4 {
+    margin: 0 0 1rem 0;
+    color: var(--gray-900);
+}
+
+.task-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.task-summary:last-child {
+    border-bottom: none;
+}
+
+.task-name {
+    color: var(--gray-700);
+}
+
+.task-time {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.time-tracking-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+/* ===== レポート生成 ===== */
+.reports-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.reports-header h2 {
+    margin: 0 0 1rem 0;
+    color: var(--gray-900);
+    font-size: 2rem;
+}
+
+.reports-header p {
+    color: var(--gray-600);
+    font-size: 1.125rem;
+}
+
+.report-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.report-type-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.report-type-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.report-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.report-type-card h3 {
+    margin: 0 0 1rem 0;
+    color: var(--gray-900);
+    font-size: 1.25rem;
+}
+
+.report-type-card p {
+    margin: 0 0 1.5rem 0;
+    color: var(--gray-600);
+    line-height: 1.6;
+}
+
+.report-preview {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 1rem;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.preview-header h3 {
+    margin: 0;
+    color: var(--gray-900);
+}
+
+.preview-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.preview-content {
+    padding: 2rem;
+}
+
+.report-section {
+    margin-bottom: 2rem;
+}
+
+.report-section h4 {
+    margin: 0 0 1rem 0;
+    color: var(--gray-900);
+    font-size: 1.125rem;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.summary-item {
+    background: var(--gray-50);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+}
+
+.summary-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.report-table th,
+.report-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.report-table th {
+    background: var(--gray-50);
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.report-table tr:hover {
+    background: var(--gray-50);
+}
+
+.report-table tr.overdue {
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.report-table tr.over-budget {
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.report-table tr.high-usage {
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-planned {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+.status-progress {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.status-completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.status-hold {
+    background: rgba(156, 163, 175, 0.1);
+    color: var(--gray-600);
+}
+
+.recommendation {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.recommendation.rec-critical {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.recommendation.rec-urgent {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.recommendation.rec-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.recommendation.rec-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.recommendation h5 {
+    margin: 0 0 0.5rem 0;
+    color: var(--gray-900);
+}
+
+.recommendation p {
+    margin: 0 0 1rem 0;
+    color: var(--gray-700);
+}
+
+.recommendation ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.recommendation li {
+    margin-bottom: 0.25rem;
+    color: var(--gray-700);
+}
+
+.report-history {
+    margin-top: 3rem;
+}
+
+.report-history h3 {
+    margin: 0 0 1.5rem 0;
+    color: var(--gray-900);
+    font-size: 1.5rem;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.history-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--gray-900);
+}
+
+.history-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.history-type {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+}
+
+.history-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.no-history {
+    text-align: center;
+    color: var(--gray-500);
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* ===== 通知システム ===== */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 3000;
+    max-width: 400px;
+    width: 100%;
+}
+
+.notification {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification.unread {
+    border-left: 4px solid var(--primary-color);
+}
+
+.notification.read {
+    opacity: 0.8;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notification-message {
+    color: var(--gray-900);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.notification-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.notification-time {
+    color: var(--gray-500);
+}
+
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.notification-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+.notification.notification-success {
+    border-left-color: var(--success);
+}
+
+.notification.notification-warning {
+    border-left-color: var(--warning);
+}
+
+.notification.notification-error {
+    border-left-color: var(--error);
+}
+
+.notification.notification-info {
+    border-left-color: var(--info);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .time-tracking-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .view-tabs {
+        justify-content: center;
+    }
+
+    .timer-display {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .entry-details {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-details {
+        grid-template-columns: 1fr;
+    }
+
+    .report-types-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .preview-actions {
+        justify-content: center;
+    }
+
+    .history-item {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .notification-container {
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+}
+
 
