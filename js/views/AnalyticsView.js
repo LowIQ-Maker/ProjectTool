@@ -14,8 +14,11 @@ class AnalyticsView {
         try {
             console.log('AnalyticsView.init: 開始');
             this.render();
-            this.bindEvents();
-            this.loadAnalytics();
+            // DOM要素が作成された後にイベントをバインド
+            setTimeout(() => {
+                this.bindEvents();
+                this.loadAnalytics();
+            }, 100);
             console.log('AnalyticsView.init: 完了');
         } catch (error) {
             console.error('AnalyticsView.init: エラーが発生しました:', error);

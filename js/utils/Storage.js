@@ -350,6 +350,100 @@ class Storage {
     clearAll() {
         return this.clearAllData();
     }
+
+    /**
+     * データの整合性をチェック
+     */
+    validateData() {
+        const projects = this.getProjects();
+        const tasks = this.getTasks();
+        const expenses = this.getExpenses();
+        
+        const errors = [];
+        const warnings = [];
+        
+        // プロジェクトの整合性チェック
+        projects.forEach(project => {
+            if (!project.name || project.name.trim() === '') {
+                errors.push(`プロジェクト "${project.id}" の名前が空です`);
+            }
+            if (!project.startDate || !project.endDate) {
+                errors.push(`プロジェクト "${project.name}" の日付が設定されていません`);
+            } else {
+                const startDate = new Date(project.startDate);
+                const endDate = new Date(project.endDate);
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    errors.push(`プロジェクト "${project.name}" の日付が無効です`);
+                } else if (startDate >= endDate) {
+                    errors.push(`プロジェクト "${project.name}" の開始日が終了日より後になっています`);
+                }
+            }
+            if (!project.budget || project.budget <= 0) {
+                warnings.push(`プロジェクト "${project.name}" の予算が設定されていません`);
+            }
+        });
+        
+        // タスクの整合性チェック
+        tasks.forEach(task => {
+            if (!task.name || task.name.trim() === '') {
+                errors.push(`タスク "${task.id}" の名前が空です`);
+            }
+            if (!task.projectId) {
+                errors.push(`タスク "${task.id}" のプロジェクトIDが設定されていません`);
+            } else {
+                const project = projects.find(p => p.id === task.projectId);
+                if (!project) {
+                    errors.push(`タスク "${task.name}" のプロジェクトが見つかりません`);
+                }
+            }
+            if (task.dueDate) {
+                const dueDate = new Date(task.dueDate);
+                if (isNaN(dueDate.getTime())) {
+                    errors.push(`タスク "${task.name}" の期限日が無効です`);
+                }
+            }
+            if (!task.priority || !['low', 'medium', 'high'].includes(task.priority)) {
+                warnings.push(`タスク "${task.name}" の優先度が設定されていません`);
+            }
+        });
+        
+        // 支出の整合性チェック
+        expenses.forEach(expense => {
+            if (!expense.item || expense.item.trim() === '') {
+                errors.push(`支出 "${expense.id}" の項目が空です`);
+            }
+            if (!expense.projectId) {
+                errors.push(`支出 "${expense.id}" のプロジェクトIDが設定されていません`);
+            } else {
+                const project = projects.find(p => p.id === expense.projectId);
+                if (!project) {
+                    errors.push(`支出 "${expense.item}" のプロジェクトが見つかりません`);
+                }
+            }
+            if (!expense.amount || expense.amount <= 0) {
+                errors.push(`支出 "${expense.item}" の金額が無効です`);
+            }
+            if (expense.date) {
+                const date = new Date(expense.date);
+                if (isNaN(date.getTime())) {
+                    errors.push(`支出 "${expense.item}" の日付が無効です`);
+                }
+            }
+        });
+        
+        return {
+            isValid: errors.length === 0,
+            errors: errors,
+            warnings: warnings,
+            summary: {
+                projects: projects.length,
+                tasks: tasks.length,
+                expenses: expenses.length,
+                errorCount: errors.length,
+                warningCount: warnings.length
+            }
+        };
+    }
 }
 
 // グローバルに公開

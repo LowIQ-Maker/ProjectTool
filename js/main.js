@@ -43,6 +43,9 @@ function initApp() {
     // プロジェクトページとタスクページのボタンも初期化
     initPageButtons();
     
+    // データ整合性チェック機能の初期化
+    initDataValidation();
+    
             // データ管理の初期化
         initDataManager();
         
@@ -2027,6 +2030,90 @@ function initReports() {
         console.log('レポート機能が初期化されました');
     } catch (error) {
         console.error('レポート機能の初期化エラー:', error);
+    }
+}
+
+/**
+ * データ整合性チェック機能の初期化
+ */
+function initDataValidation() {
+    try {
+        // データ整合性チェックボタンとダッシュボード更新ボタンのイベントリスナーを追加
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'validateData' || e.target.closest('#validateData')) {
+                validateAllData();
+            } else if (e.target.id === 'refreshDashboard' || e.target.closest('#refreshDashboard')) {
+                updateDashboard();
+            }
+        });
+        
+        // 定期的なデータ整合性チェック（5分ごと）
+        setInterval(() => {
+            const storage = new Storage();
+            const validation = storage.validateData();
+            if (!validation.isValid) {
+                console.warn('データ整合性の問題が検出されました:', validation.errors);
+                if (window.notificationManager) {
+                    window.notificationManager.show(
+                        `データ整合性の問題が${validation.errors.length}件検出されました`,
+                        'warning',
+                        { duration: 10000 }
+                    );
+                }
+            }
+        }, 5 * 60 * 1000); // 5分
+        
+        console.log('データ整合性チェック機能が初期化されました');
+    } catch (error) {
+        console.error('データ整合性チェック機能の初期化エラー:', error);
+    }
+}
+
+/**
+ * 全データの整合性チェックを実行
+ */
+function validateAllData() {
+    try {
+        const storage = new Storage();
+        const validation = storage.validateData();
+        
+        let message = `データ整合性チェック完了\n\n`;
+        message += `プロジェクト: ${validation.summary.projects}件\n`;
+        message += `タスク: ${validation.summary.tasks}件\n`;
+        message += `支出: ${validation.summary.expenses}件\n\n`;
+        
+        if (validation.isValid) {
+            message += `✅ すべてのデータが正常です`;
+            if (window.notificationManager) {
+                window.notificationManager.show(message, 'success', { duration: 5000 });
+            }
+        } else {
+            message += `❌ エラー: ${validation.errors.length}件\n`;
+            message += `⚠️ 警告: ${validation.warnings.length}件\n\n`;
+            
+            if (validation.errors.length > 0) {
+                message += `エラー詳細:\n`;
+                validation.errors.slice(0, 5).forEach(error => {
+                    message += `• ${error}\n`;
+                });
+                if (validation.errors.length > 5) {
+                    message += `...他${validation.errors.length - 5}件\n`;
+                }
+            }
+            
+            if (window.notificationManager) {
+                window.notificationManager.show(message, 'error', { duration: 15000 });
+            }
+        }
+        
+        console.log('データ整合性チェック結果:', validation);
+        return validation;
+    } catch (error) {
+        console.error('データ整合性チェックエラー:', error);
+        if (window.notificationManager) {
+            window.notificationManager.show('データ整合性チェック中にエラーが発生しました', 'error');
+        }
+        return null;
     }
 }
 
