@@ -61,7 +61,8 @@ function initApp() {
         // グローバルインスタンスの設定
         window.timeTracker = window.timeTrackerView?.timeTracker;
         
-        
+        // 初期状態でダッシュボードを表示
+        switchPage('dashboard');
     }
 
 /**
