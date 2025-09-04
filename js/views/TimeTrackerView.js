@@ -280,6 +280,9 @@ class TimeTrackerView {
 
     showCurrentView() {
         try {
+            console.log('TimeTrackerView.showCurrentView: 開始');
+            console.log('TimeTrackerView.showCurrentView: 現在のビュー:', this.currentView);
+            
             // すべてのビューを非表示
             document.querySelectorAll('.view-pane').forEach(pane => {
                 pane.classList.remove('active');
@@ -289,6 +292,9 @@ class TimeTrackerView {
             const currentPane = document.getElementById(`${this.currentView}-view`);
             if (currentPane) {
                 currentPane.classList.add('active');
+                console.log('TimeTrackerView.showCurrentView: ビューペインを表示:', currentPane.id);
+            } else {
+                console.error('TimeTrackerView.showCurrentView: ビューペインが見つかりません:', `${this.currentView}-view`);
             }
 
             // タブのアクティブ状態を更新
@@ -298,6 +304,9 @@ class TimeTrackerView {
             const activeTab = document.querySelector(`[data-view="${this.currentView}"]`);
             if (activeTab) {
                 activeTab.classList.add('active');
+                console.log('TimeTrackerView.showCurrentView: タブをアクティブに:', activeTab);
+            } else {
+                console.error('TimeTrackerView.showCurrentView: タブが見つかりません:', `[data-view="${this.currentView}"]`);
             }
 
             // サマリービューの場合、チャートを描画
@@ -307,7 +316,7 @@ class TimeTrackerView {
                 }, 100);
             }
             
-            console.log('TimeTrackerView.showCurrentView: 現在のビュー:', this.currentView);
+            console.log('TimeTrackerView.showCurrentView: 完了');
         } catch (error) {
             console.error('TimeTrackerView.showCurrentView: エラーが発生しました:', error);
         }
@@ -396,14 +405,18 @@ class TimeTrackerView {
     }
 
     bindEvents() {
-        // タブ切り替え
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.tab-btn')) {
-                const btn = e.target.closest('.tab-btn');
-                this.currentView = btn.dataset.view;
-                this.showCurrentView();
-            }
-        });
+        try {
+            console.log('TimeTrackerView.bindEvents: 開始');
+            
+            // タブ切り替え
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.tab-btn')) {
+                    const btn = e.target.closest('.tab-btn');
+                    this.currentView = btn.dataset.view;
+                    console.log('TimeTrackerView.bindEvents: タブ切り替え:', this.currentView);
+                    this.showCurrentView();
+                }
+            });
 
         // タイマー制御
         document.addEventListener('click', (e) => {
