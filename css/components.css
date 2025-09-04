@@ -247,6 +247,7 @@
 .table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* 列幅を固定 */
 }
 
 .table th {
@@ -266,6 +267,8 @@
     border-bottom: 1px solid var(--gray-100);
     color: var(--gray-900);
     font-size: 0.875rem;
+    word-wrap: break-word; /* 長いテキストを折り返し */
+    overflow-wrap: break-word;
 }
 
 .table tr:hover {
@@ -274,6 +277,76 @@
 
 .table tr:last-child td {
     border-bottom: none;
+}
+
+/* プロジェクト一覧テーブルの列幅 */
+.projects-table-container .table th:nth-child(1),
+.projects-table-container .table td:nth-child(1) { width: 15%; } /* プロジェクト名 */
+.projects-table-container .table th:nth-child(2),
+.projects-table-container .table td:nth-child(2) { width: 20%; } /* 説明 */
+.projects-table-container .table th:nth-child(3),
+.projects-table-container .table td:nth-child(3) { width: 10%; } /* 開始日 */
+.projects-table-container .table th:nth-child(4),
+.projects-table-container .table td:nth-child(4) { width: 10%; } /* 期限 */
+.projects-table-container .table th:nth-child(5),
+.projects-table-container .table td:nth-child(5) { width: 10%; } /* 予算 */
+.projects-table-container .table th:nth-child(6),
+.projects-table-container .table td:nth-child(6) { width: 10%; } /* ステータス */
+.projects-table-container .table th:nth-child(7),
+.projects-table-container .table td:nth-child(7) { width: 10%; } /* 進捗 */
+.projects-table-container .table th:nth-child(8),
+.projects-table-container .table td:nth-child(8) { width: 15%; } /* 操作 */
+
+/* タスク一覧テーブルの列幅 */
+.tasks-table-container .table th:nth-child(1),
+.tasks-table-container .table td:nth-child(1) { width: 5%; } /* チェックボックス */
+.tasks-table-container .table th:nth-child(2),
+.tasks-table-container .table td:nth-child(2) { width: 20%; } /* タスク名 */
+.tasks-table-container .table th:nth-child(3),
+.tasks-table-container .table td:nth-child(3) { width: 15%; } /* プロジェクト */
+.tasks-table-container .table th:nth-child(4),
+.tasks-table-container .table td:nth-child(4) { width: 20%; } /* 説明 */
+.tasks-table-container .table th:nth-child(5),
+.tasks-table-container .table td:nth-child(5) { width: 8%; } /* 優先度 */
+.tasks-table-container .table th:nth-child(6),
+.tasks-table-container .table td:nth-child(6) { width: 10%; } /* 期限 */
+.tasks-table-container .table th:nth-child(7),
+.tasks-table-container .table td:nth-child(7) { width: 10%; } /* 予想工数 */
+.tasks-table-container .table th:nth-child(8),
+.tasks-table-container .table td:nth-child(8) { width: 10%; } /* ステータス */
+.tasks-table-container .table th:nth-child(9),
+.tasks-table-container .table td:nth-child(9) { width: 12%; } /* 操作 */
+
+/* テーブルのレスポンシブ対応 */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table {
+        min-width: 800px; /* 最小幅を設定 */
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    /* モバイルでは列幅を調整 */
+    .projects-table-container .table th:nth-child(2),
+    .projects-table-container .table td:nth-child(2) { width: 25%; } /* 説明を広く */
+    .projects-table-container .table th:nth-child(3),
+    .projects-table-container .table td:nth-child(3) { width: 8%; } /* 開始日を狭く */
+    .projects-table-container .table th:nth-child(4),
+    .projects-table-container .table td:nth-child(4) { width: 8%; } /* 期限を狭く */
+    
+    .tasks-table-container .table th:nth-child(4),
+    .tasks-table-container .table td:nth-child(4) { width: 25%; } /* 説明を広く */
+    .tasks-table-container .table th:nth-child(6),
+    .tasks-table-container .table td:nth-child(6) { width: 8%; } /* 期限を狭く */
+    .tasks-table-container .table th:nth-child(7),
+    .tasks-table-container .table td:nth-child(7) { width: 8%; } /* 予想工数を狭く */
 }
 
 /* ===== カード ===== */
