@@ -82,14 +82,26 @@ class TaskView {
                 <td><span class="priority-badge priority-${task.priority}">${task.getPriorityText()}</span></td>
                 <td>${task.dueDate}</td>
                 <td>${task.estimatedHours}h</td>
-                <td><span class="status-badge status-${task.getStatusColor()}">${task.getStatusText()}</span></td>
                 <td>
-                    <button class="btn btn-secondary btn-sm" onclick="editTask('${task.id}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-error btn-sm" onclick="deleteTask('${task.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <select class="status-select" data-task-id="${task.id}" onchange="changeTaskStatus('${task.id}', this.value)">
+                        <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>未着手</option>
+                        <option value="in-progress" ${task.status === 'in-progress' ? 'selected' : ''}>進行中</option>
+                        <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>完了</option>
+                        <option value="on-hold" ${task.status === 'on-hold' ? 'selected' : ''}>保留</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="task-actions">
+                        <button class="btn btn-primary btn-sm" onclick="startTaskTimer('${task.id}')" title="タイマー開始">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="editTask('${task.id}')" title="編集">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-error btn-sm" onclick="deleteTask('${task.id}')" title="削除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(row);
