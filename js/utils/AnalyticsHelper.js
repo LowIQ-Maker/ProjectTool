@@ -229,7 +229,8 @@ class AnalyticsHelper {
             if (t.status === 'completed') return false;
             const dueDate = new Date(t.dueDate);
             const today = new Date();
-            return dueDate < today;
+            // 無効な日付の場合は期限切れとして扱わない
+            return !isNaN(dueDate.getTime()) && dueDate < today;
         });
 
         let riskScore = 0;
@@ -241,6 +242,16 @@ class AnalyticsHelper {
         
         const today = new Date();
         const endDate = new Date(project.endDate);
+        
+        // 無効な日付の場合はリスクを高く設定
+        if (isNaN(endDate.getTime())) {
+            console.warn('AnalyticsHelper.calculateProjectRiskLevel: 無効な終了日が検出されました', {
+                projectId: project.id,
+                endDate: project.endDate
+            });
+            return 'high';
+        }
+        
         const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
         
         if (remainingDays <= 7) riskScore += 30;
@@ -275,22 +286,27 @@ class AnalyticsHelper {
      * 総合的なプロジェクトヘルススコアを計算
      */
     calculateProjectHealthScore(projectId) {
-        const project = this.storage.getProject(projectId);
-        if (!project) return 0;
+        try {
+            const project = this.storage.getProject(projectId);
+            if (!project) return 0;
 
-        const progressPrediction = this.calculateProgressPrediction(projectId);
-        const efficiencyScore = this.calculateEfficiencyScore(projectId);
-        
-        if (!progressPrediction) return efficiencyScore;
-        
-        // 進捗予測の重み: 40%, 効率性スコアの重み: 60%
-        const progressWeight = 0.4;
-        const efficiencyWeight = 0.6;
-        
-        const progressScore = progressPrediction.isOnTrack ? 100 : 
-            Math.max(0, 100 - (progressPrediction.riskLevel === 'high' ? 50 : 25));
-        
-        return Math.round((progressScore * progressWeight) + (efficiencyScore * efficiencyWeight));
+            const progressPrediction = this.calculateProgressPrediction(projectId);
+            const efficiencyScore = this.calculateEfficiencyScore(projectId);
+            
+            if (!progressPrediction) return efficiencyScore;
+            
+            // 進捗予測の重み: 40%, 効率性スコアの重み: 60%
+            const progressWeight = 0.4;
+            const efficiencyWeight = 0.6;
+            
+            const progressScore = progressPrediction.isOnTrack ? 100 : 
+                Math.max(0, 100 - (progressPrediction.riskLevel === 'high' ? 50 : 25));
+            
+            return Math.round((progressScore * progressWeight) + (efficiencyScore * efficiencyWeight));
+        } catch (error) {
+            console.error('AnalyticsHelper.calculateProjectHealthScore: エラーが発生しました:', error);
+            return 0;
+        }
     }
 
     /**
