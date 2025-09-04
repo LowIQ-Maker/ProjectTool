@@ -58,6 +58,9 @@ function initApp() {
         // 通知管理の初期化
         initNotifications();
         
+        // グローバルインスタンスの設定
+        window.timeTracker = window.timeTrackerView?.timeTracker;
+        
         
     }
 
