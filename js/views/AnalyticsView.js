@@ -182,20 +182,29 @@ class AnalyticsView {
     }
 
     switchTab(tabName) {
-        // タブボタンのアクティブ状態を更新
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        try {
+            console.log('AnalyticsView.switchTab: 開始', tabName);
+            
+            // 既存のチャートを破棄
+            this.clearCharts();
+            
+            // タブボタンのアクティブ状態を更新
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
-        // タブコンテンツの表示を切り替え
-        document.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.remove('active');
-        });
-        document.getElementById(`${tabName}Tab`).classList.add('active');
+            // タブコンテンツの表示を切り替え
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Tab`).classList.add('active');
 
-        // タブ固有のデータを読み込み
-        this.loadTabData(tabName);
+            // タブ固有のデータを読み込み
+            this.loadTabData(tabName);
+        } catch (error) {
+            console.error('AnalyticsView.switchTab: エラーが発生しました:', error);
+        }
     }
 
     loadAnalytics() {
@@ -740,14 +749,19 @@ class AnalyticsView {
         return '改善必要';
     }
 
-    destroy() {
-        // チャートを破棄
+    clearCharts() {
+        // 既存のチャートを破棄
         Object.values(this.charts).forEach(chart => {
             if (chart && typeof chart.destroy === 'function') {
                 chart.destroy();
             }
         });
         this.charts = {};
+    }
+
+    destroy() {
+        // チャートを破棄
+        this.clearCharts();
     }
 }
 
