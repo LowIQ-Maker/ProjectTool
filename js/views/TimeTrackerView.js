@@ -418,76 +418,120 @@ class TimeTrackerView {
                 }
             });
 
-        // タイマー制御
-        document.addEventListener('click', (e) => {
-            const taskId = e.target.closest('[data-task-id]')?.dataset.taskId;
-            if (!taskId) return;
+            // タイマー制御
+            document.addEventListener('click', (e) => {
+                const taskId = e.target.closest('[data-task-id]')?.dataset.taskId;
+                if (!taskId) return;
 
-            if (e.target.classList.contains('pause-timer')) {
-                this.pauseTimer(taskId);
-            } else if (e.target.classList.contains('stop-timer')) {
-                this.stopTimer(taskId);
-            } else if (e.target.classList.contains('resume-timer')) {
-                this.resumeTimer(taskId);
+                if (e.target.closest('.pause-timer')) {
+                    console.log('TimeTrackerView.bindEvents: タイマー一時停止:', taskId);
+                    this.pauseTimer(taskId);
+                } else if (e.target.closest('.stop-timer')) {
+                    console.log('TimeTrackerView.bindEvents: タイマー停止:', taskId);
+                    this.stopTimer(taskId);
+                } else if (e.target.closest('.resume-timer')) {
+                    console.log('TimeTrackerView.bindEvents: タイマー再開:', taskId);
+                    this.resumeTimer(taskId);
+                }
+            });
+
+            // 履歴エントリの編集・削除
+            document.addEventListener('click', (e) => {
+                const entryId = e.target.closest('[data-entry-id]')?.dataset.entryId;
+                if (!entryId) return;
+
+                if (e.target.closest('.edit-entry')) {
+                    console.log('TimeTrackerView.bindEvents: エントリ編集:', entryId);
+                    this.editEntry(entryId);
+                } else if (e.target.closest('.delete-entry')) {
+                    console.log('TimeTrackerView.bindEvents: エントリ削除:', entryId);
+                    this.deleteEntry(entryId);
+                }
+            });
+
+            // エクスポート・インポート・クリア
+            document.addEventListener('click', (e) => {
+                if (e.target.id === 'export-time-data') {
+                    console.log('TimeTrackerView.bindEvents: データエクスポート');
+                    this.exportData();
+                } else if (e.target.id === 'import-time-data') {
+                    console.log('TimeTrackerView.bindEvents: データインポート');
+                    this.importData();
+                } else if (e.target.id === 'clear-time-data') {
+                    console.log('TimeTrackerView.bindEvents: データクリア');
+                    this.clearData();
+                }
+            });
+
+            // ファイル選択
+            const fileInput = document.getElementById('time-data-file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    console.log('TimeTrackerView.bindEvents: ファイル選択');
+                    this.handleFileSelection(e.target.files[0]);
+                });
             }
-        });
 
-        // 履歴エントリの編集・削除
-        document.addEventListener('click', (e) => {
-            const entryId = e.target.closest('[data-entry-id]')?.dataset.entryId;
-            if (!entryId) return;
-
-            if (e.target.classList.contains('edit-entry')) {
-                this.editEntry(entryId);
-            } else if (e.target.classList.contains('delete-entry')) {
-                this.deleteEntry(entryId);
+            // フィルター
+            const dateFilter = document.getElementById('history-date-filter');
+            if (dateFilter) {
+                dateFilter.addEventListener('change', (e) => {
+                    console.log('TimeTrackerView.bindEvents: 日付フィルター');
+                    this.filterHistory();
+                });
             }
-        });
 
-        // エクスポート・インポート・クリア
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'export-time-data') {
-                this.exportData();
-            } else if (e.target.id === 'import-time-data') {
-                this.importData();
-            } else if (e.target.id === 'clear-time-data') {
-                this.clearData();
+            const taskFilter = document.getElementById('history-task-filter');
+            if (taskFilter) {
+                taskFilter.addEventListener('change', (e) => {
+                    console.log('TimeTrackerView.bindEvents: タスクフィルター');
+                    this.filterHistory();
+                });
             }
-        });
-
-        // ファイル選択
-        document.getElementById('time-data-file-input')?.addEventListener('change', (e) => {
-            this.handleFileSelection(e.target.files[0]);
-        });
-
-        // フィルター
-        document.getElementById('history-date-filter')?.addEventListener('change', (e) => {
-            this.filterHistory();
-        });
-
-        document.getElementById('history-task-filter')?.addEventListener('change', (e) => {
-            this.filterHistory();
-        });
-        
-        console.log('TimeTrackerView.bindEvents: 完了');
+            
+            console.log('TimeTrackerView.bindEvents: 完了');
+        } catch (error) {
+            console.error('TimeTrackerView.bindEvents: エラーが発生しました:', error);
+        }
     }
 
     pauseTimer(taskId) {
-        const result = this.timeTracker.pauseTimer(taskId);
-        this.showNotification(result.message, result.success ? 'success' : 'error');
-        this.render();
+        try {
+            console.log('TimeTrackerView.pauseTimer: 開始:', taskId);
+            const result = this.timeTracker.pauseTimer(taskId);
+            console.log('TimeTrackerView.pauseTimer: 結果:', result);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            this.render();
+        } catch (error) {
+            console.error('TimeTrackerView.pauseTimer: エラーが発生しました:', error);
+            this.showNotification('タイマーの一時停止に失敗しました', 'error');
+        }
     }
 
     stopTimer(taskId) {
-        const result = this.timeTracker.stopTimer(taskId);
-        this.showNotification(result.message, result.success ? 'success' : 'error');
-        this.render();
+        try {
+            console.log('TimeTrackerView.stopTimer: 開始:', taskId);
+            const result = this.timeTracker.stopTimer(taskId);
+            console.log('TimeTrackerView.stopTimer: 結果:', result);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            this.render();
+        } catch (error) {
+            console.error('TimeTrackerView.stopTimer: エラーが発生しました:', error);
+            this.showNotification('タイマーの停止に失敗しました', 'error');
+        }
     }
 
     resumeTimer(taskId) {
-        const result = this.timeTracker.resumeTimer(taskId);
-        this.showNotification(result.message, result.success ? 'success' : 'error');
-        this.render();
+        try {
+            console.log('TimeTrackerView.resumeTimer: 開始:', taskId);
+            const result = this.timeTracker.resumeTimer(taskId);
+            console.log('TimeTrackerView.resumeTimer: 結果:', result);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            this.render();
+        } catch (error) {
+            console.error('TimeTrackerView.resumeTimer: エラーが発生しました:', error);
+            this.showNotification('タイマーの再開に失敗しました', 'error');
+        }
     }
 
     editEntry(entryId) {
