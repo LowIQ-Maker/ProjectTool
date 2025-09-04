@@ -424,9 +424,17 @@ class TaskView {
             }
 
             // タイマー開始
-            if (window.timeTracker && typeof window.timeTracker.startTimer === 'function') {
-                window.timeTracker.startTimer(taskId, task.name);
-                this.showNotification(`「${task.name}」のタイマーを開始しました`, 'success');
+            if (window.timeTrackerView && window.timeTrackerView.timeTracker && typeof window.timeTrackerView.timeTracker.startTimer === 'function') {
+                const result = window.timeTrackerView.timeTracker.startTimer(taskId, task.name);
+                if (result.success) {
+                    this.showNotification(`「${task.name}」のタイマーを開始しました`, 'success');
+                    // タイムトラッキングビューを更新
+                    if (window.timeTrackerView.render) {
+                        window.timeTrackerView.render();
+                    }
+                } else {
+                    this.showNotification(result.message || 'タイマーの開始に失敗しました', 'error');
+                }
             } else {
                 this.showNotification('タイムトラッキング機能が利用できません', 'error');
             }
