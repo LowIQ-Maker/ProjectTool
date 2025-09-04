@@ -230,7 +230,10 @@ class TimeTrackerView {
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-view="${this.currentView}"]`).classList.add('active');
+        const activeTab = document.querySelector(`[data-view="${this.currentView}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
 
         // サマリービューの場合、チャートを描画
         if (this.currentView === 'summary') {

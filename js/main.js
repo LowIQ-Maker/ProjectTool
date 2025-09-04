@@ -149,12 +149,7 @@ function initNavigation() {
             const targetId = this.getAttribute('href').substring(1);
             switchPage(targetId);
             
-            // ページタイトルの更新
-            const pageTitle = document.getElementById('pageTitle');
-            if (pageTitle) {
-                const title = this.querySelector('span')?.textContent || 'ダッシュボード';
-                pageTitle.textContent = title;
-            }
+            // ページタイトルの更新（switchPage内で処理されるため削除）
             
             // モバイルメニューを閉じる
             const sidebar = document.querySelector('.sidebar');
@@ -228,6 +223,28 @@ function switchPage(pageId) {
                 break;
         }
     }
+}
+
+/**
+ * ページタイトルの更新
+ */
+function updatePageTitle(pageId) {
+    const pageTitle = document.getElementById('pageTitle');
+    if (!pageTitle) return;
+    
+    const titleMap = {
+        'dashboard': 'ダッシュボード',
+        'projects': 'プロジェクト',
+        'tasks': 'タスク',
+        'gantt': 'ガントチャート',
+        'expenses': '支出管理',
+        'time-tracking': 'タイムトラッキング',
+        'reports': 'レポート',
+        'analytics': '高度な分析',
+        'settings': '設定'
+    };
+    
+    pageTitle.textContent = titleMap[pageId] || 'ダッシュボード';
 }
 
 /**
