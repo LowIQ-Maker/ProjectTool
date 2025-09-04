@@ -1,0 +1,602 @@
+/**
+ * 高度な分析ダッシュボードビュー
+ * プロジェクトの詳細分析、予測、リスク評価などを表示
+ */
+class AnalyticsView {
+    constructor() {
+        this.analyticsHelper = new AnalyticsHelper();
+        this.charts = {};
+        this.currentProjectId = null;
+        this.init();
+    }
+
+    init() {
+        this.render();
+        this.bindEvents();
+        this.loadAnalytics();
+    }
+
+    render() {
+        const analyticsSection = document.getElementById('analytics');
+        if (!analyticsSection) return;
+
+        analyticsSection.innerHTML = `
+            <div class="analytics-header">
+                <h2><i class="fas fa-chart-line"></i> 高度な分析</h2>
+                <div class="analytics-controls">
+                    <select id="projectSelector" class="form-select">
+                        <option value="">すべてのプロジェクト</option>
+                    </select>
+                    <button id="refreshAnalytics" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i> 更新
+                    </button>
+                </div>
+            </div>
+
+            <div class="analytics-grid">
+                <!-- プロジェクトヘルススコア -->
+                <div class="analytics-card health-score">
+                    <h3>プロジェクトヘルススコア</h3>
+                    <div class="health-score-display">
+                        <div class="score-circle">
+                            <span id="healthScore">-</span>
+                            <small>/100</small>
+                        </div>
+                        <div class="health-indicator">
+                            <span id="healthStatus">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 進捗予測 -->
+                <div class="analytics-card progress-prediction">
+                    <h3>進捗予測</h3>
+                    <div id="progressPredictionContent">
+                        <p class="no-data">プロジェクトを選択してください</p>
+                    </div>
+                </div>
+
+                <!-- リスク分析 -->
+                <div class="analytics-card risk-analysis">
+                    <h3>リスク分析</h3>
+                    <div id="riskAnalysisContent">
+                        <p class="no-data">プロジェクトを選択してください</p>
+                    </div>
+                </div>
+
+                <!-- 効率性分析 -->
+                <div class="analytics-card efficiency-analysis">
+                    <h3>効率性分析</h3>
+                    <div id="efficiencyContent">
+                        <p class="no-data">プロジェクトを選択してください</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 詳細分析セクション -->
+            <div class="detailed-analytics">
+                <div class="analytics-tabs">
+                    <button class="tab-btn active" data-tab="productivity">生産性分析</button>
+                    <button class="tab-btn" data-tab="budget">予算分析</button>
+                    <button class="tab-btn" data-tab="dependencies">依存関係</button>
+                    <button class="tab-btn" data-tab="suggestions">改善提案</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- 生産性分析タブ -->
+                    <div id="productivityTab" class="tab-pane active">
+                        <div class="chart-container">
+                            <canvas id="productivityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 予算分析タブ -->
+                    <div id="budgetTab" class="tab-pane">
+                        <div class="chart-container">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 依存関係タブ -->
+                    <div id="dependenciesTab" class="tab-pane">
+                        <div id="dependenciesContent">
+                            <p class="no-data">データを読み込み中...</p>
+                        </div>
+                    </div>
+
+                    <!-- 改善提案タブ -->
+                    <div id="suggestionsTab" class="tab-pane">
+                        <div id="suggestionsContent">
+                            <p class="no-data">データを読み込み中...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.populateProjectSelector();
+    }
+
+    populateProjectSelector() {
+        const selector = document.getElementById('projectSelector');
+        if (!selector) return;
+
+        const projects = this.analyticsHelper.storage.getProjects();
+        projects.forEach(project => {
+            const option = document.createElement('option');
+            option.value = project.id;
+            option.textContent = project.name;
+            selector.appendChild(option);
+        });
+    }
+
+    bindEvents() {
+        const projectSelector = document.getElementById('projectSelector');
+        const refreshBtn = document.getElementById('refreshAnalytics');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        if (projectSelector) {
+            projectSelector.addEventListener('change', (e) => {
+                this.currentProjectId = e.target.value;
+                this.loadProjectAnalytics();
+            });
+        }
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadAnalytics();
+            });
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchTab(e.target.dataset.tab);
+            });
+        });
+    }
+
+    switchTab(tabName) {
+        // タブボタンのアクティブ状態を更新
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+        // タブコンテンツの表示を切り替え
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+        });
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+
+        // タブ固有のデータを読み込み
+        this.loadTabData(tabName);
+    }
+
+    loadAnalytics() {
+        this.loadOverallAnalytics();
+        this.loadTabData('productivity');
+    }
+
+    loadOverallAnalytics() {
+        // 全体的な分析データを読み込み
+        const projects = this.analyticsHelper.storage.getProjects();
+        if (projects.length === 0) return;
+
+        // 平均ヘルススコアを計算
+        const totalScore = projects.reduce((sum, project) => {
+            return sum + this.analyticsHelper.calculateProjectHealthScore(project.id);
+        }, 0);
+        const averageScore = Math.round(totalScore / projects.length);
+
+        this.updateHealthScore(averageScore, '全プロジェクト平均');
+    }
+
+    loadProjectAnalytics() {
+        if (!this.currentProjectId) {
+            this.clearProjectAnalytics();
+            return;
+        }
+
+        const project = this.analyticsHelper.storage.getProject(this.currentProjectId);
+        if (!project) return;
+
+        // ヘルススコアを更新
+        const healthScore = this.analyticsHelper.calculateProjectHealthScore(this.currentProjectId);
+        this.updateHealthScore(healthScore, project.name);
+
+        // 進捗予測を更新
+        this.updateProgressPrediction();
+
+        // リスク分析を更新
+        this.updateRiskAnalysis();
+
+        // 効率性分析を更新
+        this.updateEfficiencyAnalysis();
+    }
+
+    updateHealthScore(score, projectName) {
+        const scoreElement = document.getElementById('healthScore');
+        const statusElement = document.getElementById('healthStatus');
+
+        if (scoreElement) scoreElement.textContent = score;
+        if (statusElement) {
+            let status = '';
+            let statusClass = '';
+
+            if (score >= 80) {
+                status = '優秀';
+                statusClass = 'excellent';
+            } else if (score >= 60) {
+                status = '良好';
+                statusClass = 'good';
+            } else if (score >= 40) {
+                status = '注意';
+                statusClass = 'warning';
+            } else {
+                status = '危険';
+                statusClass = 'danger';
+            }
+
+            statusElement.textContent = status;
+            statusElement.className = `health-indicator ${statusClass}`;
+        }
+    }
+
+    updateProgressPrediction() {
+        if (!this.currentProjectId) return;
+
+        const prediction = this.analyticsHelper.calculateProgressPrediction(this.currentProjectId);
+        const content = document.getElementById('progressPredictionContent');
+
+        if (!prediction || !content) return;
+
+        content.innerHTML = `
+            <div class="prediction-item">
+                <span class="label">現在の進捗:</span>
+                <span class="value">${prediction.currentProgress}%</span>
+            </div>
+            <div class="prediction-item">
+                <span class="label">残り日数:</span>
+                <span class="value">${prediction.remainingDays}日</span>
+            </div>
+            <div class="prediction-item">
+                <span class="label">予測完了日:</span>
+                <span class="value">${prediction.predictedCompletionDate}</span>
+            </div>
+            <div class="prediction-item">
+                <span class="label">状況:</span>
+                <span class="value ${prediction.isOnTrack ? 'on-track' : 'behind'}">
+                    ${prediction.isOnTrack ? '順調' : '遅延リスク'}
+                </span>
+            </div>
+            <div class="prediction-item">
+                <span class="label">リスクレベル:</span>
+                <span class="value risk-${prediction.riskLevel}">
+                    ${this.getRiskLevelText(prediction.riskLevel)}
+                </span>
+            </div>
+        `;
+    }
+
+    updateRiskAnalysis() {
+        if (!this.currentProjectId) return;
+
+        const project = this.analyticsHelper.storage.getProject(this.currentProjectId);
+        const tasks = this.analyticsHelper.storage.getTasks().filter(t => t.projectId === this.currentProjectId);
+        const criticalTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'completed');
+        const overdueTasks = tasks.filter(t => {
+            if (t.status === 'completed') return false;
+            const dueDate = new Date(t.dueDate);
+            const today = new Date();
+            return dueDate < today;
+        });
+
+        const content = document.getElementById('riskAnalysisContent');
+        if (!content) return;
+
+        content.innerHTML = `
+            <div class="risk-item">
+                <span class="label">重要なタスク:</span>
+                <span class="value">${criticalTasks.length}件</span>
+            </div>
+            <div class="risk-item">
+                <span class="label">期限超過タスク:</span>
+                <span class="value ${overdueTasks.length > 0 ? 'overdue' : ''}">${overdueTasks.length}件</span>
+            </div>
+            <div class="risk-item">
+                <span class="label">プロジェクト期限:</span>
+                <span class="value">${project.endDate}</span>
+            </div>
+            <div class="risk-item">
+                <span class="label">総合リスク:</span>
+                <span class="value risk-${this.getOverallRiskLevel(criticalTasks, overdueTasks, project)}">
+                    ${this.getOverallRiskLevelText(criticalTasks, overdueTasks, project)}
+                </span>
+            </div>
+        `;
+    }
+
+    updateEfficiencyAnalysis() {
+        if (!this.currentProjectId) return;
+
+        const efficiencyScore = this.analyticsHelper.calculateEfficiencyScore(this.currentProjectId);
+        const content = document.getElementById('efficiencyContent');
+
+        if (!content) return;
+
+        content.innerHTML = `
+            <div class="efficiency-item">
+                <span class="label">効率性スコア:</span>
+                <span class="value">${efficiencyScore}/100</span>
+            </div>
+            <div class="efficiency-item">
+                <span class="label">評価:</span>
+                <span class="value ${this.getEfficiencyRating(efficiencyScore)}">
+                    ${this.getEfficiencyRatingText(efficiencyScore)}
+                </span>
+            </div>
+        `;
+    }
+
+    loadTabData(tabName) {
+        switch (tabName) {
+            case 'productivity':
+                this.loadProductivityData();
+                break;
+            case 'budget':
+                this.loadBudgetData();
+                break;
+            case 'dependencies':
+                this.loadDependenciesData();
+                break;
+            case 'suggestions':
+                this.loadSuggestionsData();
+                break;
+        }
+    }
+
+    loadProductivityData() {
+        const productivityData = this.analyticsHelper.analyzeTeamProductivity();
+        this.renderProductivityChart(productivityData);
+    }
+
+    loadBudgetData() {
+        const budgetData = this.analyticsHelper.analyzeBudgetTrends();
+        this.renderBudgetChart(budgetData);
+    }
+
+    loadDependenciesData() {
+        const dependencies = this.analyticsHelper.analyzeProjectDependencies();
+        const content = document.getElementById('dependenciesContent');
+
+        if (!content) return;
+
+        if (dependencies.length === 0) {
+            content.innerHTML = '<p class="no-data">依存関係のリスクはありません</p>';
+            return;
+        }
+
+        let html = '<div class="dependencies-list">';
+        dependencies.forEach(dep => {
+            html += `
+                <div class="dependency-item risk-${this.getRiskLevelClass(dep.riskLevel)}">
+                    <h4>${dep.projectName}</h4>
+                    <div class="dependency-details">
+                        <span class="risk-score">リスクスコア: ${dep.riskLevel}</span>
+                        <span class="critical-tasks">重要タスク: ${dep.criticalTaskCount}件</span>
+                    </div>
+                    ${dep.dependencies.length > 0 ? `
+                        <div class="task-dependencies">
+                            <strong>依存タスク:</strong>
+                            <ul>
+                                ${dep.dependencies.map(d => `
+                                    <li>${d.taskName} → ${d.dependentTaskCount}件のタスクに影響</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        content.innerHTML = html;
+    }
+
+    loadSuggestionsData() {
+        if (!this.currentProjectId) {
+            const content = document.getElementById('suggestionsContent');
+            if (content) {
+                content.innerHTML = '<p class="no-data">プロジェクトを選択してください</p>';
+            }
+            return;
+        }
+
+        const suggestions = this.analyticsHelper.generateImprovementSuggestions(this.currentProjectId);
+        const content = document.getElementById('suggestionsContent');
+
+        if (!content) return;
+
+        if (suggestions.length === 0) {
+            content.innerHTML = '<p class="no-data">現在の改善提案はありません</p>';
+            return;
+        }
+
+        let html = '<div class="suggestions-list">';
+        suggestions.forEach(suggestion => {
+            html += `
+                <div class="suggestion-item ${suggestion.type}">
+                    <h4>${suggestion.title}</h4>
+                    <p>${suggestion.description}</p>
+                    <div class="suggestion-actions">
+                        <strong>推奨アクション:</strong>
+                        <ul>
+                            ${suggestion.actions.map(action => `<li>${action}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+
+        content.innerHTML = html;
+    }
+
+    renderProductivityChart(data) {
+        const ctx = document.getElementById('productivityChart');
+        if (!ctx) return;
+
+        if (this.charts.productivity) {
+            this.charts.productivity.destroy();
+        }
+
+        this.charts.productivity = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.projectName),
+                datasets: [{
+                    label: '完了率 (%)',
+                    data: data.map(d => Math.round(d.completionRate * 100)),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'プロジェクト別完了率'
+                    }
+                }
+            }
+        });
+    }
+
+    renderBudgetChart(data) {
+        const ctx = document.getElementById('budgetChart');
+        if (!ctx) return;
+
+        if (this.charts.budget) {
+            this.charts.budget.destroy();
+        }
+
+        this.charts.budget = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.month),
+                datasets: [{
+                    label: '月別支出 (円)',
+                    data: data.map(d => d.totalExpense),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '月別支出傾向'
+                    }
+                }
+            }
+        });
+    }
+
+    clearProjectAnalytics() {
+        const elements = [
+            'progressPredictionContent',
+            'riskAnalysisContent',
+            'efficiencyContent'
+        ];
+
+        elements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.innerHTML = '<p class="no-data">プロジェクトを選択してください</p>';
+            }
+        });
+
+        this.updateHealthScore(0, 'プロジェクト未選択');
+    }
+
+    // ヘルパーメソッド
+    getRiskLevelText(level) {
+        const texts = {
+            'low': '低',
+            'medium': '中',
+            'high': '高'
+        };
+        return texts[level] || '不明';
+    }
+
+    getOverallRiskLevel(criticalTasks, overdueTasks, project) {
+        let riskScore = 0;
+        
+        if (criticalTasks.length > 3) riskScore += 30;
+        else if (criticalTasks.length > 1) riskScore += 20;
+        
+        if (overdueTasks.length > 0) riskScore += 25;
+        
+        const today = new Date();
+        const endDate = new Date(project.endDate);
+        const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (remainingDays <= 7) riskScore += 30;
+        else if (remainingDays <= 14) riskScore += 20;
+        
+        if (riskScore >= 60) return 'high';
+        if (riskScore >= 30) return 'medium';
+        return 'low';
+    }
+
+    getOverallRiskLevelText(criticalTasks, overdueTasks, project) {
+        const level = this.getOverallRiskLevel(criticalTasks, overdueTasks, project);
+        return this.getRiskLevelText(level);
+    }
+
+    getRiskLevelClass(level) {
+        return level;
+    }
+
+    getEfficiencyRating(score) {
+        if (score >= 80) return 'excellent';
+        if (score >= 60) return 'good';
+        if (score >= 40) return 'warning';
+        return 'poor';
+    }
+
+    getEfficiencyRatingText(score) {
+        if (score >= 80) return '優秀';
+        if (score >= 60) return '良好';
+        if (score >= 40) return '注意';
+        return '改善必要';
+    }
+
+    destroy() {
+        // チャートを破棄
+        Object.values(this.charts).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
+        this.charts = {};
+    }
+}
+
+// グローバルに利用可能にする
+window.AnalyticsView = AnalyticsView;
