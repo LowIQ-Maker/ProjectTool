@@ -1,4 +1,4 @@
-//test
+//test！
 // プロジェクト管理ツール メインJavaScriptファイル
 
 document.addEventListener('DOMContentLoaded', function() {
