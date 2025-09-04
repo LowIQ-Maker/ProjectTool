@@ -20,30 +20,64 @@ class AnalyticsHelper {
         const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
         const pendingTasks = tasks.filter(t => t.status === 'pending');
 
-        // 完了率の計算
-        const completionRate = completedTasks.length / tasks.length;
-        
-        // 残り日数の計算
-        const today = new Date();
-        const endDate = new Date(project.endDate);
-        const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
-        
-        // 1日あたりの進捗率を計算
-        const totalDays = Math.ceil((endDate - new Date(project.startDate)) / (1000 * 60 * 60 * 24));
-        const dailyProgress = completionRate / totalDays;
-        
-        // 予測完了日を計算
-        const predictedCompletionDays = Math.ceil((1 - completionRate) / dailyProgress);
-        const predictedCompletionDate = new Date(today.getTime() + (predictedCompletionDays * 24 * 60 * 60 * 1000));
-        
-        return {
-            currentProgress: Math.round(completionRate * 100),
-            remainingDays,
-            dailyProgress: Math.round(dailyProgress * 100),
-            predictedCompletionDate: predictedCompletionDate.toISOString().split('T')[0],
-            isOnTrack: remainingDays >= predictedCompletionDays,
-            riskLevel: this.calculateRiskLevel(remainingDays, predictedCompletionDays, completionRate)
-        };
+        try {
+            // 完了率の計算
+            const completionRate = completedTasks.length / tasks.length;
+            
+            // 日付の検証と計算
+            const today = new Date();
+            const endDate = new Date(project.endDate);
+            const startDate = new Date(project.startDate);
+            
+            // 無効な日付のチェック
+            if (isNaN(endDate.getTime()) || isNaN(startDate.getTime())) {
+                console.warn('AnalyticsHelper.calculateProgressPrediction: 無効な日付が検出されました', {
+                    projectId: project.id,
+                    startDate: project.startDate,
+                    endDate: project.endDate
+                });
+                return {
+                    currentProgress: Math.round(completionRate * 100),
+                    remainingDays: 0,
+                    dailyProgress: 0,
+                    predictedCompletionDate: null,
+                    isOnTrack: false,
+                    riskLevel: 'high'
+                };
+            }
+            
+            const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+            
+            // 1日あたりの進捗率を計算
+            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            const dailyProgress = totalDays > 0 ? completionRate / totalDays : 0;
+            
+            // 予測完了日を計算
+            const predictedCompletionDays = dailyProgress > 0 ? Math.ceil((1 - completionRate) / dailyProgress) : 0;
+            const predictedCompletionDate = new Date(today.getTime() + (predictedCompletionDays * 24 * 60 * 60 * 1000));
+            
+            // 予測完了日の検証
+            const predictedDateString = isNaN(predictedCompletionDate.getTime()) ? null : predictedCompletionDate.toISOString().split('T')[0];
+            
+            return {
+                currentProgress: Math.round(completionRate * 100),
+                remainingDays: Math.max(0, remainingDays),
+                dailyProgress: Math.round(dailyProgress * 100),
+                predictedCompletionDate: predictedDateString,
+                isOnTrack: remainingDays >= predictedCompletionDays,
+                riskLevel: this.calculateRiskLevel(remainingDays, predictedCompletionDays, completionRate)
+            };
+        } catch (error) {
+            console.error('AnalyticsHelper.calculateProgressPrediction: エラーが発生しました:', error);
+            return {
+                currentProgress: 0,
+                remainingDays: 0,
+                dailyProgress: 0,
+                predictedCompletionDate: null,
+                isOnTrack: false,
+                riskLevel: 'high'
+            };
+        }
     }
 
     /**
