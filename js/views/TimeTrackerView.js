@@ -4,12 +4,19 @@ class TimeTrackerView {
         this.activeTimers = new Map();
         this.updateInterval = null;
         this.currentView = 'active'; // 'active', 'history', 'summary'
+        this.weeklyChart = null;
     }
 
     init() {
-        this.render();
-        this.bindEvents();
-        this.startUpdateTimer();
+        try {
+            console.log('TimeTrackerView.init: 開始');
+            this.render();
+            this.bindEvents();
+            this.startUpdateTimer();
+            console.log('TimeTrackerView.init: 完了');
+        } catch (error) {
+            console.error('TimeTrackerView.init: エラーが発生しました:', error);
+        }
     }
 
     render() {
@@ -232,45 +239,71 @@ class TimeTrackerView {
 
     renderWeeklyChart() {
         const canvas = document.getElementById('weekly-time-chart');
-        if (!canvas) return;
-
-        const weeklySummary = this.timeTracker.getWeeklyTimeSummary();
-        const labels = Object.keys(weeklySummary).map(date => {
-            const d = new Date(date);
-            return `${d.getMonth() + 1}/${d.getDate()}`;
-        });
-        const data = Object.values(weeklySummary).map(day => day.totalTime);
-
-        const ctx = canvas.getContext('2d');
-        if (this.weeklyChart) {
-            this.weeklyChart.destroy();
+        if (!canvas) {
+            console.error('TimeTrackerView: weekly-time-chartキャンバスが見つかりません');
+            return;
         }
 
-        this.weeklyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '作業時間（分）',
-                    data: data,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
+        // Chart.jsの可用性をチェック
+        if (typeof Chart === 'undefined') {
+            console.error('TimeTrackerView: Chart.jsが読み込まれていません');
+            canvas.innerHTML = '<p class="error">Chart.jsの読み込みに失敗しました</p>';
+            return;
+        }
+
+        try {
+            const weeklySummary = this.timeTracker.getWeeklyTimeSummary();
+            const labels = Object.keys(weeklySummary).map(date => {
+                const d = new Date(date);
+                return `${d.getMonth() + 1}/${d.getDate()}`;
+            });
+            const data = Object.values(weeklySummary).map(day => day.totalTime);
+
+            if (this.weeklyChart) {
+                this.weeklyChart.destroy();
+            }
+
+            this.weeklyChart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '作業時間（分）',
+                        data: data,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '時間（分）'
+                            }
+                        }
+                    },
+                    plugins: {
                         title: {
                             display: true,
-                            text: '時間（分）'
+                            text: '今週の作業時間推移'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error('TimeTrackerView: 週次チャートの描画エラー:', error);
+            canvas.innerHTML = '<p class="error">チャートの表示に失敗しました: ' + error.message + '</p>';
+        }
     }
 
     getUniqueTaskOptions() {
