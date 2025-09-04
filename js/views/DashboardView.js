@@ -282,7 +282,11 @@ class DashboardView {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                aspectRatio: 2,
+                aspectRatio: 1.5,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -378,6 +382,10 @@ class DashboardView {
                 responsive: true,
                 maintainAspectRatio: true,
                 aspectRatio: 1,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
                 plugins: {
                     legend: {
                         position: 'bottom'
@@ -472,7 +480,11 @@ class DashboardView {
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                aspectRatio: 2,
+                aspectRatio: 1.5,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
