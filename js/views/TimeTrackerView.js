@@ -74,52 +74,64 @@ class TimeTrackerView {
     }
 
     renderActiveTimers() {
-        const activeTimers = this.timeTracker.getActiveTimers();
-        
-        if (activeTimers.length === 0) {
+        try {
+            const activeTimers = this.timeTracker.getActiveTimers();
+            console.log('TimeTrackerView.renderActiveTimers: アクティブタイマー数:', activeTimers.length);
+            
+            if (activeTimers.length === 0) {
+                return `
+                    <div id="active-timers-view" class="view-pane">
+                        <div class="no-active-timers">
+                            <i class="fas fa-clock"></i>
+                            <p>現在アクティブなタイマーはありません</p>
+                            <p>タスク一覧からタイマーを開始してください</p>
+                        </div>
+                    </div>
+                `;
+            }
+
             return `
                 <div id="active-timers-view" class="view-pane">
-                    <div class="no-active-timers">
-                        <i class="fas fa-clock"></i>
-                        <p>現在アクティブなタイマーはありません</p>
-                        <p>タスク一覧からタイマーを開始してください</p>
+                    <div class="active-timers-list">
+                        ${activeTimers.map(timer => `
+                            <div class="timer-card" data-task-id="${timer.taskId}">
+                                <div class="timer-header">
+                                    <h3>${timer.taskName || '不明なタスク'}</h3>
+                                    <div class="timer-status running">
+                                        <i class="fas fa-play"></i> 実行中
+                                    </div>
+                                </div>
+                                <div class="timer-display">
+                                    <div class="elapsed-time" data-task-id="${timer.taskId}">
+                                        ${this.timeTracker.formatTime(this.timeTracker.getElapsedTime(timer.taskId))}
+                                    </div>
+                                    <div class="timer-controls">
+                                        <button class="btn btn-sm btn-warning pause-timer" data-task-id="${timer.taskId}">
+                                            <i class="fas fa-pause"></i> 一時停止
+                                        </button>
+                                        <button class="btn btn-sm btn-danger stop-timer" data-task-id="${timer.taskId}">
+                                            <i class="fas fa-stop"></i> 停止
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="timer-info">
+                                    <small>開始時刻: ${timer.startTime ? timer.startTime.toLocaleTimeString() : '不明'}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error('TimeTrackerView.renderActiveTimers: エラーが発生しました:', error);
+            return `
+                <div id="active-timers-view" class="view-pane">
+                    <div class="error">
+                        <p>アクティブタイマーの表示に失敗しました</p>
                     </div>
                 </div>
             `;
         }
-
-        return `
-            <div id="active-timers-view" class="view-pane">
-                <div class="active-timers-list">
-                    ${activeTimers.map(timer => `
-                        <div class="timer-card" data-task-id="${timer.taskId}">
-                            <div class="timer-header">
-                                <h3>${timer.taskName}</h3>
-                                <div class="timer-status running">
-                                    <i class="fas fa-play"></i> 実行中
-                                </div>
-                            </div>
-                            <div class="timer-display">
-                                <div class="elapsed-time" data-task-id="${timer.taskId}">
-                                    ${this.timeTracker.formatTime(this.timeTracker.getElapsedTime(timer.taskId))}
-                                </div>
-                                <div class="timer-controls">
-                                    <button class="btn btn-sm btn-warning pause-timer" data-task-id="${timer.taskId}">
-                                        <i class="fas fa-pause"></i> 一時停止
-                                    </button>
-                                    <button class="btn btn-sm btn-danger stop-timer" data-task-id="${timer.taskId}">
-                                        <i class="fas fa-stop"></i> 停止
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="timer-info">
-                                <small>開始時刻: ${timer.startTime.toLocaleTimeString()}</small>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
     }
 
     renderHistory() {
