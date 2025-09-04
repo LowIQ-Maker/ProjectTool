@@ -193,6 +193,7 @@ function switchPage(pageId) {
         // ページ固有の初期化処理
         switch (pageId) {
             case 'dashboard':
+                // ダッシュボードの場合のみ更新
                 updateDashboard();
                 break;
             case 'projects':
@@ -215,9 +216,6 @@ function switchPage(pageId) {
                 break;
             case 'time-tracking':
                 initTimeTracking();
-                break;
-            case 'reports':
-                initReports();
                 break;
             case 'settings':
                 initSettingsPage();
