@@ -176,6 +176,58 @@ class TaskView {
         });
     }
 
+    bindTimerEvents() {
+        const timerButtons = document.querySelectorAll('.timer-btn');
+        timerButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const taskId = e.target.closest('.timer-btn').dataset.taskId;
+                const taskName = e.target.closest('.timer-btn').dataset.taskName;
+                this.handleTimerAction(taskId, taskName);
+            });
+        });
+    }
+
+    handleTimerAction(taskId, taskName) {
+        if (!window.timeTracker) {
+            this.showNotification('タイムトラッキング機能が利用できません', 'error');
+            return;
+        }
+
+        const activeTimers = window.timeTracker.getActiveTimers();
+        const isTimerActive = activeTimers.some(timer => timer.taskId === taskId);
+
+        if (isTimerActive) {
+            // タイマーが動作中の場合は停止
+            const result = window.timeTracker.stopTimer(taskId);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            
+            // ボタンの表示を更新
+            this.updateTimerButton(taskId, false);
+        } else {
+            // タイマーを開始
+            const result = window.timeTracker.startTimer(taskId, taskName);
+            this.showNotification(result.message, result.success ? 'success' : 'error');
+            
+            // ボタンの表示を更新
+            this.updateTimerButton(taskId, true);
+        }
+    }
+
+    updateTimerButton(taskId, isActive) {
+        const button = document.querySelector(`[data-task-id="${taskId}"].timer-btn`);
+        if (button) {
+            if (isActive) {
+                button.innerHTML = '<i class="fas fa-stop"></i>';
+                button.className = 'btn btn-warning btn-sm timer-btn';
+                button.title = 'タイムトラッキングを停止';
+            } else {
+                button.innerHTML = '<i class="fas fa-clock"></i>';
+                button.className = 'btn btn-primary btn-sm timer-btn';
+                button.title = 'タイムトラッキングを開始';
+            }
+        }
+    }
+
     sortTasks(sortBy) {
         const tasks = this.taskManager.getTasks();
         const sortedTasks = this.taskManager.sortTasks(tasks, sortBy);
