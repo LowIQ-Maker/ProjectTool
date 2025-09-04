@@ -1,3 +1,14 @@
+/* ===== ページセクションの表示制御 ===== */
+.dashboard-section,
+.page-section {
+    display: none;
+}
+
+.dashboard-section.active,
+.page-section.active {
+    display: block;
+}
+
 /* ===== フォームコンポーネント ===== */
 .form-group {
     margin-bottom: 1.5rem;
